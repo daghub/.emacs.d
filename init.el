@@ -1,16 +1,97 @@
 ; Add load directory
 (add-to-list 'load-path "~/.emacs.d/") 
-;(add-to-list 'load-path "~/emacs/magit-1.1.1") 
+(add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1") 
 
 ; Active google style guides for C/C++
 (add-hook 'c-mode-common-hook 'google-set-c-style)
 (add-hook 'c-mode-common-hook 'google-make-newline-indent)
+
+;;;;;;; GNU Global
+
+; Enable incremental update of Gnu Global GTAGS when saving a file
+(defun gtags-root-dir ()
+  "Returns GTAGS root directory or nil if doesn't exist."
+  (with-temp-buffer
+    (if (zerop (call-process "global" nil t nil "-pr"))
+	(buffer-substring (point-min) (1- (point-max)))
+      nil)))
+(defun gtags-update ()
+  "Make GTAGS incremental update"
+  (call-process "global" nil nil nil "-u"))
+(defun gtags-update-hook ()
+  (when (gtags-root-dir)
+    (gtags-update)))
+(add-hook 'after-save-hook #'gtags-update-hook)
+
+(add-hook 'gtags-mode-hook 
+	  (lambda()
+	    (local-set-key (kbd "M-.") 'gtags-find-tag)
+	    (local-set-key (kbd "M-,") 'gtags-find-rtag)
+	    (local-set-key [(control meta ,)] 'gtags-find-symbol)
+	    ))
+
+(add-hook 'c-mode-common-hook
+	  (lambda ()
+	    (require 'gtags)
+	    (gtags-mode t)))
+;;;;;;;
+
+;;;;;;; auto complete
+(require 'auto-complete-config)
+;(add-to-list 'ac-dictionary-directories (concat myoptdir "AC/ac-dict"))
+(require 'auto-complete-clang)
+(setq ac-auto-start nil)
+(setq ac-quick-help-delay 0.5)
+;; (ac-set-trigger-key "TAB")
+;; (define-key ac-mode-map  [(control tab)] 'auto-complete)
+(define-key ac-mode-map  [(control tab)] 'auto-complete)
+(defun my-ac-config ()
+  (setq-default ac-sources '(ac-source-abbrev ac-source-dictionary ac-source-words-in-same-mode-buffers))
+  (add-hook 'emacs-lisp-mode-hook 'ac-emacs-lisp-mode-setup)
+  (add-hook 'c-mode-common-hook 'ac-cc-mode-setup)
+  ;;(add-hook 'ruby-mode-hook 'ac-ruby-mode-setup)
+  ;;(add-hook 'css-mode-hook 'ac-css-mode-setup)
+  (add-hook 'auto-complete-mode-hook 'ac-common-setup)
+  (global-auto-complete-mode t))
+(defun my-ac-cc-mode-setup ()
+  (setq ac-sources (append '(ac-source-clang ac-source-yasnippet ac-source-gtags) ac-sources)))
+(add-hook 'c-mode-common-hook 'my-ac-cc-mode-setup)
+;; ac-source-gtags
+(my-ac-config)
+
+(setq ac-clang-flags
+      (split-string
+  "
+ -DSP_LIBSPOTIFY=1
+ -DSP_WITH_SOCIAL=1
+ -DSP_LIBSPOTIFY_WITH_SOCIAL=1
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/client
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/src
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/client/base/lib
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/log-parser 
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/boink
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/protobuf
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/passive_boink
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/client/boink/cpp
+ "
+               ))
+
+;;;;;;;;;
+;;;;;;;;;
+
+; Enable copying between dired windows
+(setq dired-dwim-target t)
 
 ; uniquify - use sensibel buffer names
 (require 'uniquify)
 
 ; multi eshell support
 (require 'multi-eshell)
+
+; enable winner mode (Let's you jump to previous window configurations)
+(winner-mode 1)
 
 ; ediff settings
 (setq ediff-window-setup-function 'ediff-setup-windows-plain) ; integrate control panel in active frame
