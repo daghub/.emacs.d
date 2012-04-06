@@ -81,6 +81,9 @@
 ;;;;;;;;;
 ;;;;;;;;;
 
+; Enable jumping between cpp and header file using keyboard shortcut
+(global-set-key (kbd "M-o") 'ff-find-other-file)
+
 ; Enable copying between dired windows
 (setq dired-dwim-target t)
 
@@ -92,6 +95,7 @@
 
 ; enable winner mode (Let's you jump to previous window configurations)
 (winner-mode 1)
+(windmove-default-keybindings 'meta)
 
 ; ediff settings
 (setq ediff-window-setup-function 'ediff-setup-windows-plain) ; integrate control panel in active frame
@@ -159,3 +163,50 @@
   (delete-trailing-whitespace)
   (indent-region (point-min) (point-max) nil)
   (untabify (point-min) (point-max)))
+
+;;;;;;;;;;;;;;;;;;;;;
+;; ERC
+;;;;;;;;;;;;;;;;;;;;;
+(require 'tls)
+(require 'erc)
+(setq tls-program '("openssl s_client -connect %h:%p -no_ssl2 -ign_eof -CAfile /opt/local/etc/openssl/ca-certs.pem"))
+
+; M-x start-irc
+(defun start-irc ()
+  "Connect to IRC."
+  (interactive)
+  (erc-tls :server "irc.spotify.net" :port 7000
+	   :nick "dag" :full-name "Dag Ekengren" :password "OwivCyin8")
+  (setq erc-autojoin-channels-alist '(("irc.spotify.net" "#platform" "#libspotify" "#client" "#operations")))
+  )
+
+; Notify growl when I'm mentioned
+(defvar growlnotify-command (executable-find "growlnotify") "The path to growlnotify")
+
+(defun growl (title message)
+  "Shows a message through the growl notification system using
+ `growlnotify-command` as the program."
+  (flet ((encfn (s) (encode-coding-string s (keyboard-coding-system))) )
+    (let* ((process (start-process "growlnotify" nil
+                                   growlnotify-command
+                                   (encfn title)
+                                   "-a" "Emacs"
+                                   "-n" "Emacs")))
+      (process-send-string process (encfn message))
+      (process-send-string process "\n")
+      (process-send-eof process)))
+  t)
+
+(defun my-erc-hook (match-type nick message)
+  "Shows a growl notification, when user's nick was mentioned. If the buffer is currently not visible, makes it sticky."
+  (unless (posix-string-match "^\\** *Users on #" message)
+    (growl
+     (concat "ERC: name mentioned on: " (buffer-name (current-buffer)))
+     message
+     )))
+
+(add-hook 'erc-text-matched-hook 'my-erc-hook)
+
+; Start erc on emacs startup
+(start-irc)
+
