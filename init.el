@@ -1,10 +1,16 @@
+; Emacs config file
+
 ; Add load directory
-(add-to-list 'load-path "~/.emacs.d/") 
-(add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1") 
+(add-to-list 'load-path "~/.emacs.d/")
+(add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
+(add-to-list 'load-path "~/.emacs.d/sunrise-commander")
 
 ; Active google style guides for C/C++
 (add-hook 'c-mode-common-hook 'google-set-c-style)
 (add-hook 'c-mode-common-hook 'google-make-newline-indent)
+
+;; open *help* in current frame
+(setq special-display-regexps (remove "[ ]?\\*[hH]elp.*" special-display-regexps))
 
 ;;;;;;; GNU Global
 
@@ -208,5 +214,35 @@
 (add-hook 'erc-text-matched-hook 'my-erc-hook)
 
 ; Start erc on emacs startup
-(start-irc)
+;(start-irc)
+
+;;;;;;;;;;;;;;;;;;;
+;; windows/revive
+;;;;;;;;;;;;;;;;;;;
+;(require 'windows)
+;(win:startup-with-window)
+;(define-key ctl-x-map "C" 'see-you-again)
+
+(require 'elscreen)
+
+
+;; F9 creates a new elscreen, shift-F9 kills it
+;(global-set-key (kbd "<f9>"    ) 'elscreen-create)
+;(global-set-key (kbd "S-<f9>"  ) 'elscreen-kill)  
+
+
+;; Windowskey+PgUP/PgDown switches between elscreens
+;(global-set-key (kbd "<f8>") 'elscreen-previous) 
+;(global-set-key (kbd "S-<f8>")  'elscreen-next) 
+
+;(require 'workgroups)
+;(workgroups-mode 1)
+;(setq wg-prefix-key (kbd "C-c a"))
+;(wg-load "~/.emacs.d/.workgroups")
+
+;;;;;;;;;;;;;;;;;;;;
+;; Sunrise commander
+;;;;;;;;;;;;;;;;;;;;
+(require 'sunrise-commander)
+(add-to-list 'auto-mode-alist '("\\.srvm\\'" . sr-virtual-mode))
 
