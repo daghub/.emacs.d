@@ -5,8 +5,27 @@
 (add-to-list 'load-path "~/.emacs.d/apel-10.8")
 (add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
 (add-to-list 'load-path "~/.emacs.d/sunrise-commander")
+(add-to-list 'load-path "~/.emacs.d/magit")
+
+; Avoid emacs creating backup files
+(setq make-backup-files nil)
+
+;;;;;;;;;;;;;;;;;;;
+;ido
+(require 'ido)
+(ido-mode t)
+
+;;;;;;;;;;;;;;;;;;;;
+;; Sunrise commander
+;;;;;;;;;;;;;;;;;;;;
+(require 'sunrise-commander)
+(add-to-list 'auto-mode-alist '("\\.srvm\\'" . sr-virtual-mode))
+(global-set-key (kbd "C-c x") 'sunrise)
+(global-set-key (kbd "C-c X") 'sunrise-cd)
 
 ; Active google style guides for C/C++
+(require 'google-c-style)
+
 (add-hook 'c-mode-common-hook 'google-set-c-style)
 (add-hook 'c-mode-common-hook 'google-make-newline-indent)
 
@@ -72,16 +91,16 @@
  -DSP_LIBSPOTIFY=1
  -DSP_WITH_SOCIAL=1
  -DSP_LIBSPOTIFY_WITH_SOCIAL=1
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/client
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/src
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/client/base/lib
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/log-parser 
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/boink
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/protobuf
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/passive_boink
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/client/boink/cpp
+ -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/targets/Darwin-x86_64-debug
+ -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/
+ -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/client
+ -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/src
+ -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/client/base/lib
+ -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/targets/Darwin-x86_64-debug/obj/log-parser 
+ -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/targets/Darwin-x86_64-debug/obj/boink
+ -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/targets/Darwin-x86_64-debug/obj/protobuf
+ -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/targets/Darwin-x86_64-debug/obj/passive_boink
+ -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/client/boink/cpp
  "
                ))
 
@@ -107,22 +126,29 @@
 ; ediff settings
 (setq ediff-window-setup-function 'ediff-setup-windows-plain) ; integrate control panel in active frame
 (setq ediff-split-window-function 'split-window-horizontally) ; split horiz
+(setq ediff-diff-options "-w") ; ignore white space
+(setq-default ediff-ignore-similar-regions t)
+
 ; iswitchb stuff
-(require 'edmacro) ; avoid Symbol’s function definition is void: edmacro-parse-keys errorc
-(iswitchb-mode 1)
-(iswitchb-default-keybindings)
-(setq iswitchb-buffer-ignore '("^ " "*Buffer"))
+;(require 'edmacro) ; avoid Symbol’s function definition is void: edmacro-parse-keys errorc
+;(iswitchb-mode 1)
+;(iswitchb-default-keybindings)
+;(setq iswitchb-buffer-ignore '("^ " "*Buffer"))
 
-(defun iswitchb-local-keys ()
-  (mapc (lambda (K) 
-	  (let* ((key (car K)) (fun (cdr K)))
-	    (define-key iswitchb-mode-map (edmacro-parse-keys key) fun)))
-	'(("<right>" . iswitchb-next-match)
-	  ("<left>"  . iswitchb-prev-match)
-	  ("<up>"    . ignore             )
-	  ("<down>"  . ignore             ))))
+;(defun iswitchb-local-keys ()
+;  (mapc (lambda (K) 
+;	  (let* ((key (car K)) (fun (cdr K)))
+;	    (define-key iswitchb-mode-map (edmacro-parse-keys key) fun)))
+;	'(("<right>" . iswitchb-next-match)
+;	  ("<left>"  . iswitchb-prev-match)
+;	  ("<up>"    . ignore             )
+;	  ("<down>"  . ignore             ))))
 
-(add-hook 'iswitchb-define-mode-map-hook 'iswitchb-local-keys)
+;(add-hook 'iswitchb-define-mode-map-hook 'iswitchb-local-keys)
+
+
+
+;;;;;;;;;;;;;;;;;;;
 
 ; Enable function that will select the tab offset based on the file edited (by guessing)
 (require 'guess-offset)
@@ -139,10 +165,12 @@
 	      auto-mode-alist))
 
 ; Egg - Emacs interface to git
-(require 'egg)
+;(require 'egg)
 
 ; Magit - Emacs interface to git
-;(autoload 'magit-status "magit" nil t)
+(require 'magit)
+(autoload 'magit-status "magit" nil t)
+
 
 ; Icicles
 ;(require 'icicles)
@@ -153,8 +181,7 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(cua-mode t nil (cua-base))
-; '(egg-enable-tooltip t)
+ '(tool-bar-mode nil)
  '(uniquify-buffer-name-style (quote post-forward-angle-brackets) nil (uniquify)))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
@@ -224,8 +251,8 @@
 ;(win:startup-with-window)
 ;(define-key ctl-x-map "C" 'see-you-again)
 
-(require 'elscreen)
-
+; Activate elscreen with independent most-recently-used-buffer-lists
+(require 'elscreen-buffer-list)
 
 ;; F9 creates a new elscreen, shift-F9 kills it
 ;(global-set-key (kbd "<f9>"    ) 'elscreen-create)
@@ -241,9 +268,32 @@
 ;(setq wg-prefix-key (kbd "C-c a"))
 ;(wg-load "~/.emacs.d/.workgroups")
 
-;;;;;;;;;;;;;;;;;;;;
-;; Sunrise commander
-;;;;;;;;;;;;;;;;;;;;
-(require 'sunrise-commander)
-(add-to-list 'auto-mode-alist '("\\.srvm\\'" . sr-virtual-mode))
 
+;; iflipb - flip buffer with alt-TAB
+
+(require 'iflipb)
+
+(global-set-key (kbd "<M-tab>") 'iflipb-next-buffer)
+(global-set-key (kbd "<M-S-tab>") 'iflipb-previous-buffer)
+
+
+;(autoload 'cycle-buffer "cycle-buffer" "Cycle forward." t)
+;(autoload 'cycle-buffer-backward "cycle-buffer" "Cycle backward." t)
+;(autoload 'cycle-buffer-permissive "cycle-buffer" "Cycle forward allowing *buffers*." t)
+;(autoload 'cycle-buffer-backward-permissive "cycle-buffer" "Cycle backward allowing *buffers*." t)
+;(autoload 'cycle-buffer-toggle-interesting "cycle-buffer" "Toggle if this buffer/ will be considered." t)
+;(global-set-key [kbd "<M-tab>"]        'cycle-buffer-backward)
+;(global-set-key [kbd "<M-S-tab>"]       'cycle-buffer)
+;;(global-set-key [(shift f9)]  'cycle-buffer-backward-permissive)
+;;(global-set-key [(shift f10)] 'cycle-buffer-permissive)
+
+; Undo-tree
+(require 'undo-tree)
+(global-undo-tree-mode)
+(global-set-key (kbd "C--") 'undo-tree-undo)
+(global-set-key (kbd "M--") 'undo-tree-redo)
+
+
+;; Use left option key as meta, and right option key as ALT-GR
+(setq mac-option-key-is-meta t)
+(setq mac-right-option-modifier nil)
