@@ -129,24 +129,6 @@
 (setq ediff-diff-options "-w") ; ignore white space
 (setq-default ediff-ignore-similar-regions t)
 
-; iswitchb stuff
-;(require 'edmacro) ; avoid Symbol’s function definition is void: edmacro-parse-keys errorc
-;(iswitchb-mode 1)
-;(iswitchb-default-keybindings)
-;(setq iswitchb-buffer-ignore '("^ " "*Buffer"))
-
-;(defun iswitchb-local-keys ()
-;  (mapc (lambda (K) 
-;	  (let* ((key (car K)) (fun (cdr K)))
-;	    (define-key iswitchb-mode-map (edmacro-parse-keys key) fun)))
-;	'(("<right>" . iswitchb-next-match)
-;	  ("<left>"  . iswitchb-prev-match)
-;	  ("<up>"    . ignore             )
-;	  ("<down>"  . ignore             ))))
-
-;(add-hook 'iswitchb-define-mode-map-hook 'iswitchb-local-keys)
-
-
 
 ;;;;;;;;;;;;;;;;;;;
 
@@ -171,10 +153,6 @@
 (require 'magit)
 (autoload 'magit-status "magit" nil t)
 
-
-; Icicles
-;(require 'icicles)
-;(icy-mode 1)
 
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
@@ -244,29 +222,8 @@
 ; Start erc on emacs startup
 ;(start-irc)
 
-;;;;;;;;;;;;;;;;;;;
-;; windows/revive
-;;;;;;;;;;;;;;;;;;;
-;(require 'windows)
-;(win:startup-with-window)
-;(define-key ctl-x-map "C" 'see-you-again)
-
 ; Activate elscreen with independent most-recently-used-buffer-lists
 (require 'elscreen-buffer-list)
-
-;; F9 creates a new elscreen, shift-F9 kills it
-;(global-set-key (kbd "<f9>"    ) 'elscreen-create)
-;(global-set-key (kbd "S-<f9>"  ) 'elscreen-kill)  
-
-
-;; Windowskey+PgUP/PgDown switches between elscreens
-;(global-set-key (kbd "<f8>") 'elscreen-previous) 
-;(global-set-key (kbd "S-<f8>")  'elscreen-next) 
-
-;(require 'workgroups)
-;(workgroups-mode 1)
-;(setq wg-prefix-key (kbd "C-c a"))
-;(wg-load "~/.emacs.d/.workgroups")
 
 
 (require 'buffer-stack)
@@ -276,24 +233,6 @@
 (global-set-key [(control f11)] 'buffer-stack-down)
 (global-set-key [(control f12)] 'buffer-stack-track)
 ;(global-set-key [(control f12)] 'buffer-stack-untrack)
-
-;; iflipb - flip buffer with alt-TAB
-
-;(require 'iflipb)
-
-;(global-set-key (kbd "<M-tab>") 'iflipb-next-buffer)
-;(global-set-key (kbd "<M-S-tab>") 'iflipb-previous-buffer)
-
-
-;(autoload 'cycle-buffer "cycle-buffer" "Cycle forward." t)
-;(autoload 'cycle-buffer-backward "cycle-buffer" "Cycle backward." t)
-;(autoload 'cycle-buffer-permissive "cycle-buffer" "Cycle forward allowing *buffers*." t)
-;(autoload 'cycle-buffer-backward-permissive "cycle-buffer" "Cycle backward allowing *buffers*." t)
-;(autoload 'cycle-buffer-toggle-interesting "cycle-buffer" "Toggle if this buffer/ will be considered." t)
-;(global-set-key [kbd "<M-tab>"]        'cycle-buffer-backward)
-;(global-set-key [kbd "<M-S-tab>"]       'cycle-buffer)
-;;(global-set-key [(shift f9)]  'cycle-buffer-backward-permissive)
-;;(global-set-key [(shift f10)] 'cycle-buffer-permissive)
 
 ; Undo-tree
 (require 'undo-tree)
@@ -305,6 +244,9 @@
 ;; Use left option key as meta, and right option key as ALT-GR
 (setq mac-option-key-is-meta t)
 (setq mac-right-option-modifier nil)
+
+;; Full screen toogle
+(global-set-key (kbd "C-S-F") 'ns-toggle-fullscreen)
 
 ;; Global function key mappings
 (global-set-key (kbd "C-<f1>") (lambda () (interactive) (elscreen-goto 0)))
