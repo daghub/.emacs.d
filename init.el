@@ -70,7 +70,7 @@
 (setq ac-quick-help-delay 0.5)
 ;; (ac-set-trigger-key "TAB")
 ;; (define-key ac-mode-map  [(control tab)] 'auto-complete)
-(define-key ac-mode-map  [(control tab)] 'auto-complete)
+(define-key ac-mode-map  [(f4)] 'auto-complete)
 (defun my-ac-config ()
   (setq-default ac-sources '(ac-source-abbrev ac-source-dictionary ac-source-words-in-same-mode-buffers))
   (add-hook 'emacs-lisp-mode-hook 'ac-emacs-lisp-mode-setup)
@@ -269,12 +269,20 @@
 ;(wg-load "~/.emacs.d/.workgroups")
 
 
+(require 'buffer-stack)
+;(global-set-key [(f9)] 'buffer-stack-bury)
+;(global-set-key [(control f9)] 'buffer-stack-bury-and-kill)
+;(global-set-key [(f10)] 'buffer-stack-up)
+(global-set-key [(control f11)] 'buffer-stack-down)
+(global-set-key [(control f12)] 'buffer-stack-track)
+;(global-set-key [(control f12)] 'buffer-stack-untrack)
+
 ;; iflipb - flip buffer with alt-TAB
 
-(require 'iflipb)
+;(require 'iflipb)
 
-(global-set-key (kbd "<M-tab>") 'iflipb-next-buffer)
-(global-set-key (kbd "<M-S-tab>") 'iflipb-previous-buffer)
+;(global-set-key (kbd "<M-tab>") 'iflipb-next-buffer)
+;(global-set-key (kbd "<M-S-tab>") 'iflipb-previous-buffer)
 
 
 ;(autoload 'cycle-buffer "cycle-buffer" "Cycle forward." t)
@@ -297,3 +305,11 @@
 ;; Use left option key as meta, and right option key as ALT-GR
 (setq mac-option-key-is-meta t)
 (setq mac-right-option-modifier nil)
+
+;; Global function key mappings
+(global-set-key (kbd "C-<f1>") (lambda () (interactive) (elscreen-goto 0)))
+(global-set-key (kbd "C-<f2>") (lambda () (interactive) (elscreen-goto 1)))
+(global-set-key (kbd "C-<f3>") (lambda () (interactive) (elscreen-goto 2)))
+(global-set-key (kbd "C-<f6>") 'magit-status)
+(global-set-key (kbd "C-<f7>") 'compile)
+
