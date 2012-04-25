@@ -6,6 +6,24 @@
 (add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
 (add-to-list 'load-path "~/.emacs.d/sunrise-commander")
 (add-to-list 'load-path "~/.emacs.d/magit")
+(add-to-list 'load-path "~/.emacs.d/color-theme-6.6.0")
+(add-to-list 'load-path "~/.emacs.d/emacs-color-theme-solarized")
+
+;; Try the Menlo font
+(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(default ((t (:height 120 :family "Menlo"))))
+ '(font-lock-comment-face ((t (:foreground "#3f7f5f")))))
+
+;; Color theme
+(require 'color-theme-solarized)
+(color-theme-solarized-dark)
+
+;; Disable scrollbars
+(scroll-bar-mode -1)
 
 ; Avoid emacs creating backup files
 (setq make-backup-files nil)
@@ -121,7 +139,11 @@
 
 ; enable winner mode (Let's you jump to previous window configurations)
 (winner-mode 1)
-(windmove-default-keybindings 'meta)
+;(windmove-default-keybindings 'meta)
+(global-set-key (kbd "<left>")  'windmove-left)
+(global-set-key (kbd "<right>") 'windmove-right)
+(global-set-key (kbd "<up>")    'windmove-up)
+(global-set-key (kbd "<down>")  'windmove-down)
 
 ; ediff settings
 (setq ediff-window-setup-function 'ediff-setup-windows-plain) ; integrate control panel in active frame
@@ -243,7 +265,7 @@
 
 ;; Use left option key as meta, and right option key as ALT-GR
 (setq mac-option-key-is-meta t)
-(setq mac-right-option-modifier nil)
+;(setq mac-right-option-modifier nil)
 
 ;; Full screen toogle
 (global-set-key (kbd "C-S-F") 'ns-toggle-fullscreen)
@@ -254,4 +276,26 @@
 (global-set-key (kbd "C-<f3>") (lambda () (interactive) (elscreen-goto 2)))
 (global-set-key (kbd "C-<f6>") 'magit-status)
 (global-set-key (kbd "C-<f7>") 'compile)
+
+;; Use Ctrl-H as backspace
+(define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
+
+;; Make Ctrl-W function as backward-kill-word if region is not active
+(defun kill-region-or-backward-kill-word (&optional arg region)
+  "`kill-region' if the region is active, otherwise `backward-kill-word'"
+  (interactive
+   (list (prefix-numeric-value current-prefix-arg) (use-region-p)))
+  (if region
+      (kill-region (region-beginning) (region-end))
+    (backward-kill-word arg)))
+(global-set-key (kbd "C-w") 'kill-region-or-backward-kill-word)
+
+;; Make ALT-key function for entering some special characters on a Mac keyboard
+(global-set-key (kbd "M-2") (lambda() (interactive) (insert "@")))
+(global-set-key (kbd "M-8") (lambda() (interactive) (insert "[")))
+(global-set-key (kbd "M-9") (lambda() (interactive) (insert "]")))
+(global-set-key (kbd "M-(") (lambda() (interactive) (insert "{")))
+(global-set-key (kbd "M-)") (lambda() (interactive) (insert "}")))
+(global-set-key (kbd "M-4") (lambda() (interactive) (insert "$")))
+(global-set-key (kbd "M-/") (lambda() (interactive) (insert "\\")))
 
