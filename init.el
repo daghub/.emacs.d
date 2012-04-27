@@ -9,14 +9,14 @@
 (add-to-list 'load-path "~/.emacs.d/color-theme-6.6.0")
 (add-to-list 'load-path "~/.emacs.d/emacs-color-theme-solarized")
 
-;; Try the Menlo font
-(custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(default ((t (:height 120 :family "Menlo"))))
- '(font-lock-comment-face ((t (:foreground "#3f7f5f")))))
+;; ;; Try the Menlo font
+;; (custom-set-faces
+;;   ;; custom-set-faces was added by Custom.
+;;   ;; If you edit it by hand, you could mess it up, so be careful.
+;;   ;; Your init file should contain only one such instance.
+;;   ;; If there is more than one, they won't work right.
+;;  '(default ((t (:height 120 :family "Menlo"))))
+;;  '(font-lock-comment-face ((t (:foreground "#3f7f5f")))))
 
 ;; Color theme
 (require 'color-theme-solarized)
@@ -148,8 +148,8 @@
 ; ediff settings
 (setq ediff-window-setup-function 'ediff-setup-windows-plain) ; integrate control panel in active frame
 (setq ediff-split-window-function 'split-window-horizontally) ; split horiz
-(setq ediff-diff-options "-w") ; ignore white space
-(setq-default ediff-ignore-similar-regions t)
+;(setq ediff-diff-options "-w") ; ignore white space
+;(setq-default ediff-ignore-similar-regions t)
 
 
 ;;;;;;;;;;;;;;;;;;;
@@ -262,6 +262,8 @@
 (global-set-key (kbd "C--") 'undo-tree-undo)
 (global-set-key (kbd "M--") 'undo-tree-redo)
 
+; Visual bookmarks
+(require 'bm)
 
 ;; Use left option key as meta, and right option key as ALT-GR
 (setq mac-option-key-is-meta t)
@@ -271,11 +273,17 @@
 (global-set-key (kbd "C-S-F") 'ns-toggle-fullscreen)
 
 ;; Global function key mappings
-(global-set-key (kbd "C-<f1>") (lambda () (interactive) (elscreen-goto 0)))
-(global-set-key (kbd "C-<f2>") (lambda () (interactive) (elscreen-goto 1)))
-(global-set-key (kbd "C-<f3>") (lambda () (interactive) (elscreen-goto 2)))
+(global-set-key (kbd "M-<f1>") (lambda () (interactive) (elscreen-goto 0)))
+(global-set-key (kbd "M-<f2>") (lambda () (interactive) (elscreen-goto 1)))
+(global-set-key (kbd "M-<f3>") (lambda () (interactive) (elscreen-goto 2)))
 (global-set-key (kbd "C-<f6>") 'magit-status)
 (global-set-key (kbd "C-<f7>") 'compile)
+(global-set-key (kbd "C-<f8>") 'multi-eshell)
+(global-set-key (kbd "C-<f9>") 'sunrise-cd)
+(global-set-key (kbd "C-<f2>") 'bm-toggle)
+(global-set-key (kbd "<f2>")   'bm-next)
+(global-set-key (kbd "<S-f2>") 'bm-previous)
+
 
 ;; Use Ctrl-H as backspace
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
@@ -298,4 +306,9 @@
 (global-set-key (kbd "M-)") (lambda() (interactive) (insert "}")))
 (global-set-key (kbd "M-4") (lambda() (interactive) (insert "$")))
 (global-set-key (kbd "M-/") (lambda() (interactive) (insert "\\")))
+
+;; Use Ctrl-x m as a shortcut for Alt-X (execute-extended-command)
+(global-set-key (kbd "C-x C-m") 'execute-extended-command)
+(global-set-key (kbd "C-c C-m") 'execute-extended-command) ; In case I mis-type
+
 
