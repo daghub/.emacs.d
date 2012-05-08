@@ -31,6 +31,9 @@
 ;;;;;;;;;;;;;;;;;;;
 ;ido
 (require 'ido)
+(setq ido-enable-flex-matching t)
+(setq ido-everywhere t)
+(setq ido-use-filename-at-point 'guess)
 (ido-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;
@@ -139,11 +142,11 @@
 
 ; enable winner mode (Let's you jump to previous window configurations)
 (winner-mode 1)
-;(windmove-default-keybindings 'meta)
-(global-set-key (kbd "<left>")  'windmove-left)
-(global-set-key (kbd "<right>") 'windmove-right)
-(global-set-key (kbd "<up>")    'windmove-up)
-(global-set-key (kbd "<down>")  'windmove-down)
+(windmove-default-keybindings 'meta)
+;; (global-set-key (kbd "<left>")  'windmove-left)
+;; (global-set-key (kbd "<right>") 'windmove-right)
+;; (global-set-key (kbd "<up>")    'windmove-up)
+;; (global-set-key (kbd "<down>")  'windmove-down)
 
 ; ediff settings
 (setq ediff-window-setup-function 'ediff-setup-windows-plain) ; integrate control panel in active frame
@@ -155,7 +158,10 @@
 ;;;;;;;;;;;;;;;;;;;
 
 ; Enable function that will select the tab offset based on the file edited (by guessing)
-(require 'guess-offset)
+;(autoload 'guess-style-set-variable "guess-style" nil t)
+;(autoload 'guess-style-guess-variable "guess-style")
+;(autoload 'guess-style-guess-all "guess-style" nil t)
+;(add-hook 'c-mode-common-hook 'guess-style-guess-all)
 
 ; Show trailing white space
 (setq-default show-trailing-whitespace t)
@@ -201,45 +207,45 @@
 ;;;;;;;;;;;;;;;;;;;;;
 ;; ERC
 ;;;;;;;;;;;;;;;;;;;;;
-(require 'tls)
-(require 'erc)
-(setq tls-program '("openssl s_client -connect %h:%p -no_ssl2 -ign_eof -CAfile /opt/local/etc/openssl/ca-certs.pem"))
+;(require 'tls)
+;(require 'erc)
+;(setq tls-program '("openssl s_client -connect %h:%p -no_ssl2 -ign_eof -CAfile /opt/local/etc/openssl/ca-certs.pem"))
 
 ; M-x start-irc
-(defun start-irc ()
-  "Connect to IRC."
-  (interactive)
-  (erc-tls :server "irc.spotify.net" :port 7000
-	   :nick "dag" :full-name "Dag Ekengren" :password "OwivCyin8")
-  (setq erc-autojoin-channels-alist '(("irc.spotify.net" "#platform" "#libspotify" "#client" "#operations")))
-  )
+;(defun start-irc ()
+;  "Connect to IRC."
+;  (interactive)
+;  (erc-tls :server "irc.spotify.net" :port 7000
+;	   :nick "dag" :full-name "Dag Ekengren" :password "OwivCyin8")
+;;   (setq erc-autojoin-channels-alist '(("irc.spotify.net" "#platform" "#libspotify" "#client" "#operations")))
+;;   )
 
-; Notify growl when I'm mentioned
-(defvar growlnotify-command (executable-find "growlnotify") "The path to growlnotify")
+;; ; Notify growl when I'm mentioned
+;; (defvar growlnotify-command (executable-find "growlnotify") "The path to growlnotify")
 
-(defun growl (title message)
-  "Shows a message through the growl notification system using
- `growlnotify-command` as the program."
-  (flet ((encfn (s) (encode-coding-string s (keyboard-coding-system))) )
-    (let* ((process (start-process "growlnotify" nil
-                                   growlnotify-command
-                                   (encfn title)
-                                   "-a" "Emacs"
-                                   "-n" "Emacs")))
-      (process-send-string process (encfn message))
-      (process-send-string process "\n")
-      (process-send-eof process)))
-  t)
+;; (defun growl (title message)
+;;   "Shows a message through the growl notification system using
+;;  `growlnotify-command` as the program."
+;;   (flet ((encfn (s) (encode-coding-string s (keyboard-coding-system))) )
+;;     (let* ((process (start-process "growlnotify" nil
+;;                                    growlnotify-command
+;;                                    (encfn title)
+;;                                    "-a" "Emacs"
+;;                                    "-n" "Emacs")))
+;;       (process-send-string process (encfn message))
+;;       (process-send-string process "\n")
+;;       (process-send-eof process)))
+;;   t)
 
-(defun my-erc-hook (match-type nick message)
-  "Shows a growl notification, when user's nick was mentioned. If the buffer is currently not visible, makes it sticky."
-  (unless (posix-string-match "^\\** *Users on #" message)
-    (growl
-     (concat "ERC: name mentioned on: " (buffer-name (current-buffer)))
-     message
-     )))
+;; (defun my-erc-hook (match-type nick message)
+;;   "Shows a growl notification, when user's nick was mentioned. If the buffer is currently not visible, makes it sticky."
+;;   (unless (posix-string-match "^\\** *Users on #" message)
+;;     (growl
+;;      (concat "ERC: name mentioned on: " (buffer-name (current-buffer)))
+;;      message
+;;      )))
 
-(add-hook 'erc-text-matched-hook 'my-erc-hook)
+;; (add-hook 'erc-text-matched-hook 'my-erc-hook)
 
 ; Start erc on emacs startup
 ;(start-irc)
@@ -288,6 +294,10 @@
 ;; Use Ctrl-H as backspace
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 
+;; Use Ctrl-Ö äs beginning of buffer
+(define-key key-translation-map (kbd "C-ö") 'beginning-of-buffer)
+(define-key key-translation-map (kbd "C-ä") 'end-of-buffer)
+
 ;; Make Ctrl-W function as backward-kill-word if region is not active
 (defun kill-region-or-backward-kill-word (&optional arg region)
   "`kill-region' if the region is active, otherwise `backward-kill-word'"
@@ -306,9 +316,31 @@
 (global-set-key (kbd "M-)") (lambda() (interactive) (insert "}")))
 (global-set-key (kbd "M-4") (lambda() (interactive) (insert "$")))
 (global-set-key (kbd "M-/") (lambda() (interactive) (insert "\\")))
+(global-set-key (kbd "M-7") (lambda() (interactive) (insert "|")))
 
 ;; Use Ctrl-x m as a shortcut for Alt-X (execute-extended-command)
 (global-set-key (kbd "C-x C-m") 'execute-extended-command)
 (global-set-key (kbd "C-c C-m") 'execute-extended-command) ; In case I mis-type
+
+;: Make sure i never miss a tab char again when editing C/C++
+(defface extra-whitespace-face
+  '((t (:background "pale green")))
+  "Used for tabs and such.")
+(defvar my-extra-keywords
+  '(("\t" . 'extra-whitespace-face)))
+(add-hook 'c-mode-common-hook
+	  (lambda () (font-lock-add-keywords nil my-extra-keywords)))
+; Set the cursor to wide, covering a whole tab
+(setq x-stretch-cursor t)
+
+;; Turn off sound beep
+(setq bell-volume 0)
+(setq sound-alist nil)
+
+;; Use CUA mode for rectangle editing (only)
+(setq cua-enable-cua-keys nil) ;; only for rectangles
+(cua-mode t)
+
+
 
 
