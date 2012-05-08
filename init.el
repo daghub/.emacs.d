@@ -294,7 +294,7 @@
 ;; Use Ctrl-H as backspace
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 
-;; Use Ctrl-Ö äs beginning of buffer
+;; Use Ctrl-Ã Ã¤s beginning of buffer
 (define-key key-translation-map (kbd "C-ö") 'beginning-of-buffer)
 (define-key key-translation-map (kbd "C-ä") 'end-of-buffer)
 
