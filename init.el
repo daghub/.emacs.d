@@ -6,6 +6,7 @@
 (add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
 (add-to-list 'load-path "~/.emacs.d/sunrise-commander")
 (add-to-list 'load-path "~/.emacs.d/magit")
+(add-to-list 'load-path "~/.emacs.d/mo-git-blame")
 (add-to-list 'load-path "~/.emacs.d/color-theme-6.6.0")
 (add-to-list 'load-path "~/.emacs.d/emacs-color-theme-solarized")
 
@@ -157,12 +158,6 @@
 
 ;;;;;;;;;;;;;;;;;;;
 
-; Enable function that will select the tab offset based on the file edited (by guessing)
-;(autoload 'guess-style-set-variable "guess-style" nil t)
-;(autoload 'guess-style-guess-variable "guess-style")
-;(autoload 'guess-style-guess-all "guess-style" nil t)
-;(add-hook 'c-mode-common-hook 'guess-style-guess-all)
-
 ; Show trailing white space
 (setq-default show-trailing-whitespace t)
 
@@ -180,7 +175,9 @@
 ; Magit - Emacs interface to git
 (require 'magit)
 (autoload 'magit-status "magit" nil t)
-
+(autoload 'mo-git-blame-file "mo-git-blame" nil t)
+(autoload 'mo-git-blame-current "mo-git-blame" nil t)
+(setq mo-git-blame-use-ido t)
 
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
@@ -272,8 +269,10 @@
 (require 'bm)
 
 ;; Use left option key as meta, and right option key as ALT-GR
-(setq mac-option-key-is-meta t)
+;(setq mac-option-key-is-meta t)
 ;(setq mac-right-option-modifier nil)
+(setq mac-option-modifier 'meta)
+(setq mac-command-modifier 'ctrl)
 
 ;; Full screen toogle
 (global-set-key (kbd "C-S-F") 'ns-toggle-fullscreen)
