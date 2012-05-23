@@ -55,21 +55,29 @@
 (setq special-display-regexps (remove "[ ]?\\*[hH]elp.*" special-display-regexps))
 
 ;;;;;;; GNU Global
-
-; Enable incremental update of Gnu Global GTAGS when saving a file
 (defun gtags-root-dir ()
   "Returns GTAGS root directory or nil if doesn't exist."
   (with-temp-buffer
     (if (zerop (call-process "global" nil t nil "-pr"))
 	(buffer-substring (point-min) (1- (point-max)))
       nil)))
-(defun gtags-update ()
-  "Make GTAGS incremental update"
-  (call-process "global" nil nil nil "-u"))
-(defun gtags-update-hook ()
-  (when (gtags-root-dir)
-    (gtags-update)))
-(add-hook 'after-save-hook #'gtags-update-hook)
+(defun gtags-update-single(filename)  
+  "Update Gtags database for changes in a single file"
+  (interactive)
+  (start-process "update-gtags" "update-gtags" "bash" "-c" (concat "cd " (gtags-root-dir) " ; gtags --single-update " filename )))
+(defun gtags-update-current-file()
+  (interactive)
+  (defvar filename)
+  (setq filename (replace-regexp-in-string (gtags-root-dir) "." (buffer-file-name (current-buffer))))
+  (gtags-update-single filename)
+  (message "Gtags updated for %s" filename))
+(defun gtags-update-hook()
+  "Update GTAGS file incrementally upon saving a file"
+  (when gtags-mode
+    (when (gtags-root-dir)
+      (gtags-update-current-file))))
+(add-hook 'after-save-hook 'gtags-update-hook)
+
 
 (add-hook 'gtags-mode-hook 
 	  (lambda()
@@ -140,6 +148,8 @@
 
 ; multi eshell support
 (require 'multi-eshell)
+; make eshell tab completion behave like bash
+(setq eshell-cmpl-cycle-completions nil)
 
 ; enable winner mode (Let's you jump to previous window configurations)
 (winner-mode 1)
@@ -288,7 +298,7 @@
 (global-set-key (kbd "C-<f2>") 'bm-toggle)
 (global-set-key (kbd "<f2>")   'bm-next)
 (global-set-key (kbd "<S-f2>") 'bm-previous)
-
+;(global-set-key (kbd "C-<f4>") 'gtags-update-hook)
 
 ;; Use Ctrl-H as backspace
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
@@ -333,8 +343,10 @@
 (setq x-stretch-cursor t)
 
 ;; Turn off sound beep
-(setq bell-volume 0)
-(setq sound-alist nil)
+;(setq bell-volume 0)
+;(setq sound-alist nil)
+(setq ring-bell-function 'ignore)
+
 
 ;; Use CUA mode for rectangle editing (only)
 (setq cua-enable-cua-keys nil) ;; only for rectangles
