@@ -121,16 +121,16 @@
  -DSP_LIBSPOTIFY=1
  -DSP_WITH_SOCIAL=1
  -DSP_LIBSPOTIFY_WITH_SOCIAL=1
- -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/targets/Darwin-x86_64-debug
- -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/
- -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/client
- -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/src
- -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/client/base/lib
- -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/targets/Darwin-x86_64-debug/obj/log-parser 
- -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/targets/Darwin-x86_64-debug/obj/boink
- -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/targets/Darwin-x86_64-debug/obj/protobuf
- -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/targets/Darwin-x86_64-debug/obj/passive_boink
- -I/Users/dag/Documents/Dev/gitrepos/alt.libspotify/client/boink/cpp
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/client
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/src
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/client/base/lib
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/log-parser 
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/boink
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/protobuf
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/passive_boink
+ -I/Users/dag/Documents/Dev/gitrepos/libspotify/client/boink/cpp
  "
                ))
 
@@ -169,7 +169,7 @@
 ;;;;;;;;;;;;;;;;;;;
 
 ; Show trailing white space
-(setq-default show-trailing-whitespace t)
+;(setq-default show-trailing-whitespace t)
 
 ; CMake major mode
 (setq load-path (cons (expand-file-name "~/emacs/cmake-mode.el") load-path))
@@ -301,7 +301,8 @@
 ;(global-set-key (kbd "C-<f4>") 'gtags-update-hook)
 
 ;; Use Ctrl-H as backspace
-(define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
+;(define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
+(define-key key-translation-map [?\C-h] [?\C-?])
 
 ;; Use Ctrl-Ã Ã¤s beginning of buffer
 (define-key key-translation-map (kbd "C-ö") 'beginning-of-buffer)
@@ -332,15 +333,15 @@
 (global-set-key (kbd "C-c C-m") 'execute-extended-command) ; In case I mis-type
 
 ;: Make sure i never miss a tab char again when editing C/C++
-(defface extra-whitespace-face
-  '((t (:background "pale green")))
-  "Used for tabs and such.")
-(defvar my-extra-keywords
-  '(("\t" . 'extra-whitespace-face)))
-(add-hook 'c-mode-common-hook
-	  (lambda () (font-lock-add-keywords nil my-extra-keywords)))
+;(defface extra-whitespace-face
+;  '((t (:background "pale green")))
+;  "Used for tabs and such.")
+;(defvar my-extra-keywords
+;  '(("\t" . 'extra-whitespace-face)))
+;(add-hook 'c-mode-common-hook
+;	  (lambda () (font-lock-add-keywords nil my-extra-keywords)))
 ; Set the cursor to wide, covering a whole tab
-(setq x-stretch-cursor t)
+;(setq x-stretch-cursor t)
 
 ;; Turn off sound beep
 ;(setq bell-volume 0)
@@ -352,6 +353,29 @@
 (setq cua-enable-cua-keys nil) ;; only for rectangles
 (cua-mode t)
 
+;; Show 100-line rule, show white space problems
+(require 'whitespace)
+(setq whitespace-style '(face empty tabs lines-tail trailing tab-mark))
+(setq whitespace-line-column 100)
+(global-whitespace-mode t)
+
+
+; FLymake
+;; flymake
+(defun my-flymake-show-next-error()
+  (interactive)
+  (flymake-goto-next-error)
+  (flymake-display-err-menu-for-current-line)
+  )
+
+;;
+;; Setting some C / C++ defaults
+;;
+(add-hook 'c-mode-common-hook
+          (function (lambda ()
+                      ;; more stuff here
+                      (flymake-mode t)
+                      )))
 
 
 
