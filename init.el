@@ -55,41 +55,41 @@
 (setq special-display-regexps (remove "[ ]?\\*[hH]elp.*" special-display-regexps))
 
 ;;;;;;; GNU Global
-(defun gtags-root-dir ()
-  "Returns GTAGS root directory or nil if doesn't exist."
-  (with-temp-buffer
-    (if (zerop (call-process "global" nil t nil "-pr"))
-	(buffer-substring (point-min) (1- (point-max)))
-      nil)))
-(defun gtags-update-single(filename)  
-  "Update Gtags database for changes in a single file"
-  (interactive)
-  (start-process "update-gtags" "update-gtags" "bash" "-c" (concat "cd " (gtags-root-dir) " ; gtags --single-update " filename )))
-(defun gtags-update-current-file()
-  (interactive)
-  (defvar filename)
-  (setq filename (replace-regexp-in-string (gtags-root-dir) "." (buffer-file-name (current-buffer))))
-  (gtags-update-single filename)
-  (message "Gtags updated for %s" filename))
-(defun gtags-update-hook()
-  "Update GTAGS file incrementally upon saving a file"
-  (when gtags-mode
-    (when (gtags-root-dir)
-      (gtags-update-current-file))))
-(add-hook 'after-save-hook 'gtags-update-hook)
+;; (defun gtags-root-dir ()
+;;   "Returns GTAGS root directory or nil if doesn't exist."
+;;   (with-temp-buffer
+;;     (if (zerop (call-process "global" nil t nil "-pr"))
+;; 	(buffer-substring (point-min) (1- (point-max)))
+;;       nil)))
+;; (defun gtags-update-single(filename)  
+;;   "Update Gtags database for changes in a single file"
+;;   (interactive)
+;;   (start-process "update-gtags" "update-gtags" "bash" "-c" (concat "cd " (gtags-root-dir) " ; gtags --single-update " filename )))
+;; (defun gtags-update-current-file()
+;;   (interactive)
+;;   (defvar filename)
+;;   (setq filename (replace-regexp-in-string (gtags-root-dir) "." (buffer-file-name (current-buffer))))
+;;   (gtags-update-single filename)
+;;   (message "Gtags updated for %s" filename))
+;; (defun gtags-update-hook()
+;;   "Update GTAGS file incrementally upon saving a file"
+;;   (when gtags-mode
+;;     (when (gtags-root-dir)
+;;       (gtags-update-current-file))))
+;; (add-hook 'after-save-hook 'gtags-update-hook)
 
+;; (add-hook 'gtags-mode-hook 
+;; 	  (lambda()
+;; 	    (local-set-key (kbd "M-.") 'gtags-find-tag)
+;; 	    (local-set-key (kbd "M-,") 'gtags-find-rtag)
+;; 	    (local-set-key [(control meta ,)] 'gtags-find-symbol)
+;; 	    ))
 
-(add-hook 'gtags-mode-hook 
-	  (lambda()
-	    (local-set-key (kbd "M-.") 'gtags-find-tag)
-	    (local-set-key (kbd "M-,") 'gtags-find-rtag)
-	    (local-set-key [(control meta ,)] 'gtags-find-symbol)
-	    ))
-
-(add-hook 'c-mode-common-hook
-	  (lambda ()
-	    (require 'gtags)
-	    (gtags-mode t)))
+;; (add-hook 'c-mode-common-hook
+;; 	  (lambda ()
+;; 	    (require 'gtags)
+;; 	    (gtags-mode t)))
+;; (setq gtags-mode 0) ;default
 ;;;;;;;
 
 ;;;;;;; auto complete
@@ -151,13 +151,6 @@
 ; make eshell tab completion behave like bash
 (setq eshell-cmpl-cycle-completions nil)
 
-; enable winner mode (Let's you jump to previous window configurations)
-(winner-mode 1)
-(windmove-default-keybindings 'meta)
-;; (global-set-key (kbd "<left>")  'windmove-left)
-;; (global-set-key (kbd "<right>") 'windmove-right)
-;; (global-set-key (kbd "<up>")    'windmove-up)
-;; (global-set-key (kbd "<down>")  'windmove-down)
 
 ; ediff settings
 (setq ediff-window-setup-function 'ediff-setup-windows-plain) ; integrate control panel in active frame
@@ -211,51 +204,6 @@
   (indent-region (point-min) (point-max) nil)
   (untabify (point-min) (point-max)))
 
-;;;;;;;;;;;;;;;;;;;;;
-;; ERC
-;;;;;;;;;;;;;;;;;;;;;
-;(require 'tls)
-;(require 'erc)
-;(setq tls-program '("openssl s_client -connect %h:%p -no_ssl2 -ign_eof -CAfile /opt/local/etc/openssl/ca-certs.pem"))
-
-; M-x start-irc
-;(defun start-irc ()
-;  "Connect to IRC."
-;  (interactive)
-;  (erc-tls :server "irc.spotify.net" :port 7000
-;	   :nick "dag" :full-name "Dag Ekengren" :password "OwivCyin8")
-;;   (setq erc-autojoin-channels-alist '(("irc.spotify.net" "#platform" "#libspotify" "#client" "#operations")))
-;;   )
-
-;; ; Notify growl when I'm mentioned
-;; (defvar growlnotify-command (executable-find "growlnotify") "The path to growlnotify")
-
-;; (defun growl (title message)
-;;   "Shows a message through the growl notification system using
-;;  `growlnotify-command` as the program."
-;;   (flet ((encfn (s) (encode-coding-string s (keyboard-coding-system))) )
-;;     (let* ((process (start-process "growlnotify" nil
-;;                                    growlnotify-command
-;;                                    (encfn title)
-;;                                    "-a" "Emacs"
-;;                                    "-n" "Emacs")))
-;;       (process-send-string process (encfn message))
-;;       (process-send-string process "\n")
-;;       (process-send-eof process)))
-;;   t)
-
-;; (defun my-erc-hook (match-type nick message)
-;;   "Shows a growl notification, when user's nick was mentioned. If the buffer is currently not visible, makes it sticky."
-;;   (unless (posix-string-match "^\\** *Users on #" message)
-;;     (growl
-;;      (concat "ERC: name mentioned on: " (buffer-name (current-buffer)))
-;;      message
-;;      )))
-
-;; (add-hook 'erc-text-matched-hook 'my-erc-hook)
-
-; Start erc on emacs startup
-;(start-irc)
 
 ; Activate elscreen with independent most-recently-used-buffer-lists
 (require 'elscreen-buffer-list)
@@ -278,6 +226,10 @@
 ; Visual bookmarks
 (require 'bm)
 
+; Switch between windows using cursors keys
+(require 'windmove)
+(windmove-default-keybindings 'meta)
+
 ;; Use left option key as meta, and right option key as ALT-GR
 ;(setq mac-option-key-is-meta t)
 ;(setq mac-right-option-modifier nil)
@@ -298,6 +250,8 @@
 (global-set-key (kbd "C-<f2>") 'bm-toggle)
 (global-set-key (kbd "<f2>")   'bm-next)
 (global-set-key (kbd "<S-f2>") 'bm-previous)
+(global-set-key (kbd "<f4>")   'auto-complete)
+
 ;(global-set-key (kbd "C-<f4>") 'gtags-update-hook)
 
 ;; Use Ctrl-H as backspace
@@ -359,7 +313,6 @@
 (setq whitespace-line-column 100)
 (global-whitespace-mode t)
 
-
 ; FLymake
 ;; flymake
 (defun my-flymake-show-next-error()
@@ -371,11 +324,11 @@
 ;;
 ;; Setting some C / C++ defaults
 ;;
-(add-hook 'c-mode-common-hook
-          (function (lambda ()
-                      ;; more stuff here
-                      (flymake-mode t)
-                      )))
+;(add-hook 'c-mode-common-hook
+;          (function (lambda ()
+;                      ;; more stuff here
+;                      (flymake-mode t)
+;                      )))
 
 
 
