@@ -270,7 +270,7 @@ a prefix doen't contain any upper case letters."
 (defvar auto-complete-mode nil
   "Dummy variable to suppress compiler warnings.")
 
-(defvar ac-cursor-color "blanched almond"
+(defvar ac-cursor-color "bg-base0"
   "Old cursor color.")
 
 (defvar ac-inline nil
