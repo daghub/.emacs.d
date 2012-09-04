@@ -55,41 +55,41 @@
 (setq special-display-regexps (remove "[ ]?\\*[hH]elp.*" special-display-regexps))
 
 ;;;;;;; GNU Global
-;; (defun gtags-root-dir ()
-;;   "Returns GTAGS root directory or nil if doesn't exist."
-;;   (with-temp-buffer
-;;     (if (zerop (call-process "global" nil t nil "-pr"))
-;; 	(buffer-substring (point-min) (1- (point-max)))
-;;       nil)))
-;; (defun gtags-update-single(filename)  
-;;   "Update Gtags database for changes in a single file"
-;;   (interactive)
-;;   (start-process "update-gtags" "update-gtags" "bash" "-c" (concat "cd " (gtags-root-dir) " ; gtags --single-update " filename )))
-;; (defun gtags-update-current-file()
-;;   (interactive)
-;;   (defvar filename)
-;;   (setq filename (replace-regexp-in-string (gtags-root-dir) "." (buffer-file-name (current-buffer))))
-;;   (gtags-update-single filename)
-;;   (message "Gtags updated for %s" filename))
-;; (defun gtags-update-hook()
-;;   "Update GTAGS file incrementally upon saving a file"
-;;   (when gtags-mode
-;;     (when (gtags-root-dir)
-;;       (gtags-update-current-file))))
-;; (add-hook 'after-save-hook 'gtags-update-hook)
+(defun gtags-root-dir ()
+   "Returns GTAGS root directory or nil if doesn't exist."
+   (with-temp-buffer
+     (if (zerop (call-process "global" nil t nil "-pr"))
+ 	(buffer-substring (point-min) (1- (point-max)))
+       nil)))
+(defun gtags-update-single(filename)
+   "Update Gtags database for changes in a single file"
+   (interactive)
+   (start-process "update-gtags" "update-gtags" "bash" "-c" (concat "cd " (gtags-root-dir) " ; gtags --single-update " filename )))
+(defun gtags-update-current-file()
+  (interactive)
+  (defvar filename)
+  (setq filename (replace-regexp-in-string (gtags-root-dir) "." (buffer-file-name (current-buffer))))
+  (gtags-update-single filename)
+  (message "Gtags updated for %s" filename))
+(defun gtags-update-hook()
+  "Update GTAGS file incrementally upon saving a file"
+  (when gtags-mode
+    (when (gtags-root-dir)
+      (gtags-update-current-file))))
+(add-hook 'after-save-hook 'gtags-update-hook)
 
-;; (add-hook 'gtags-mode-hook 
-;; 	  (lambda()
-;; 	    (local-set-key (kbd "M-.") 'gtags-find-tag)
-;; 	    (local-set-key (kbd "M-,") 'gtags-find-rtag)
-;; 	    (local-set-key [(control meta ,)] 'gtags-find-symbol)
-;; 	    ))
+(add-hook 'gtags-mode-hook 
+	  (lambda() (interactive)
+	    (local-set-key (kbd "M-.") 'gtags-find-tag)
+	    (local-set-key (kbd "M-,") 'gtags-find-rtag)
+	    (local-set-key (kbd "C-M-,") 'gtags-find-symbol)
+	    ))
 
-;; (add-hook 'c-mode-common-hook
-;; 	  (lambda ()
-;; 	    (require 'gtags)
-;; 	    (gtags-mode t)))
-;; (setq gtags-mode 0) ;default
+(add-hook 'c-mode-common-hook
+	  (lambda ()
+	    (require 'gtags)
+	    (gtags-mode t)))
+(setq gtags-mode 0) ;default
 ;;;;;;;
 
 ;;;;;;; auto complete
@@ -115,25 +115,13 @@
 ;; ac-source-gtags
 (my-ac-config)
 
+(setq ac-clang-flags-string
+ "-D_DEBUG -D__cplusplus -DSP_LIBSPOTIFY=1 -DSP_WITH_SOCIAL=1 -DSP_LIBSPOTIFY_WITH_SOCIAL=1 -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug -I/Users/dag/Documents/Dev/gitrepos/libspotify/ -I/Users/dag/Documents/Dev/gitrepos/libspotify/client -I/Users/dag/Documents/Dev/gitrepos/libspotify/src -I/Users/dag/Documents/Dev/gitrepos/libspotify/client/base/lib -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/log-parser -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/boink -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/protobuf -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/passive_boink -I/Users/dag/Documents/Dev/gitrepos/libspotify/client/boink/cpp"
+ )
 (setq ac-clang-flags
-      (split-string
-  "
- -DSP_LIBSPOTIFY=1
- -DSP_WITH_SOCIAL=1
- -DSP_LIBSPOTIFY_WITH_SOCIAL=1
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/client
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/src
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/client/base/lib
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/log-parser 
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/boink
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/protobuf
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/passive_boink
- -I/Users/dag/Documents/Dev/gitrepos/libspotify/client/boink/cpp
- "
-               ))
-
+      (split-string ac-clang-flags-string))
+(setq c-macro-preprocessor "cpp -xc++")
+(setq c-macro-cppflags ac-clang-flags-string)
 ;;;;;;;;;
 ;;;;;;;;;
 
@@ -206,7 +194,7 @@
 
 
 ; Activate elscreen with independent most-recently-used-buffer-lists
-(require 'elscreen-buffer-list)
+;(require 'elscreen-buffer-list)
 
 
 (require 'buffer-stack)
@@ -240,10 +228,12 @@
 (global-set-key (kbd "C-S-F") 'ns-toggle-fullscreen)
 
 ;; Global function key mappings
-(global-set-key (kbd "M-<f1>") (lambda () (interactive) (elscreen-goto 0)))
-(global-set-key (kbd "M-<f2>") (lambda () (interactive) (elscreen-goto 1)))
-(global-set-key (kbd "M-<f3>") (lambda () (interactive) (elscreen-goto 2)))
+;(global-set-key (kbd "M-<f1>") (lambda () (interactive) (elscreen-goto 0)))
+;(global-set-key (kbd "M-<f2>") (lambda () (interactive) (elscreen-goto 1)))
+;(global-set-key (kbd "M-<f3>") (lambda () (interactive) (elscreen-goto 2)))
 (global-set-key (kbd "C-<f6>") 'magit-status)
+(global-set-key (kbd "C-<f7>") 'flymake-mode)
+(global-set-key (kbd "<f7>") 'recompile)
 (global-set-key (kbd "C-<f7>") 'compile)
 (global-set-key (kbd "C-<f8>") 'multi-eshell)
 (global-set-key (kbd "C-<f9>") 'sunrise-cd)
@@ -320,15 +310,38 @@
   (flymake-goto-next-error)
   (flymake-display-err-menu-for-current-line)
   )
+; Show flymake errors in minibuffer
+(eval-after-load 'flymake '(require 'flymake-cursor))
+; Use underline instead of highlight for flymake errors
+(custom-set-faces
+ '(flymake-errline ((((class color)) (:underline "red"))))
+ '(flymake-warnline ((((class color)) (:underline "yellow")))))
+(global-set-key (kbd "M-p") 'flymake-goto-prev-error)
+(global-set-key (kbd "M-n") 'flymake-goto-next-error)
 
-;;
-;; Setting some C / C++ defaults
-;;
-;(add-hook 'c-mode-common-hook
-;          (function (lambda ()
-;                      ;; more stuff here
-;                      (flymake-mode t)
-;                      )))
+;;-------------
+;;Add color to the current GUD line (obrigado google)
 
+(defvar gud-overlay
+(let* ((ov (make-overlay (point-min) (point-min))))
+(overlay-put ov 'face 'secondary-selection)
+ov)
+"Overlay variable for GUD highlighting.")
+
+(defadvice gud-display-line (after my-gud-highlight act)
+"Highlight current line."
+(let* ((ov gud-overlay)
+(bf (gud-find-file true-file)))
+(save-excursion
+  (set-buffer bf)
+  (move-overlay ov (line-beginning-position) (line-end-position)
+  (current-buffer)))))
+
+(defun gud-kill-buffer ()
+(if (eq major-mode 'gud-mode)
+(delete-overlay gud-overlay)))
+
+(add-hook 'kill-buffer-hook 'gud-kill-buffer)
+;;-------------------------------------------------------------
 
 
