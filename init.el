@@ -36,6 +36,10 @@
 (setq ido-everywhere t)
 (setq ido-use-filename-at-point 'guess)
 (ido-mode t)
+; idomenu allows ido to search iMenu results for a buffer
+(autoload 'idomenu "idomenu" nil t)
+(add-hook 'c-mode-common-hook 'imenu-add-menubar-index)
+(global-set-key (kbd "M-i") 'idomenu)
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Sunrise commander
@@ -100,7 +104,7 @@
 (setq ac-quick-help-delay 0.5)
 ;; (ac-set-trigger-key "TAB")
 ;; (define-key ac-mode-map  [(control tab)] 'auto-complete)
-(define-key ac-mode-map  [(f4)] 'auto-complete)
+(define-key ac-mode-map  [M-tab] 'auto-complete)
 (defun my-ac-config ()
   (setq-default ac-sources '(ac-source-abbrev ac-source-dictionary ac-source-words-in-same-mode-buffers))
   (add-hook 'emacs-lisp-mode-hook 'ac-emacs-lisp-mode-setup)
@@ -112,7 +116,6 @@
 (defun my-ac-cc-mode-setup ()
   (setq ac-sources (append '(ac-source-clang ac-source-yasnippet ac-source-gtags) ac-sources)))
 (add-hook 'c-mode-common-hook 'my-ac-cc-mode-setup)
-;; ac-source-gtags
 (my-ac-config)
 
 (setq ac-clang-flags-string
@@ -127,6 +130,9 @@
 
 ; Enable jumping between cpp and header file using keyboard shortcut
 (global-set-key (kbd "M-o") 'ff-find-other-file)
+; Make sure we can find headers where we want them
+(setq cc-search-directories
+      '("." ".." "../.."))
 
 ; Enable copying between dired windows
 (setq dired-dwim-target t)
@@ -208,8 +214,8 @@
 ; Undo-tree
 (require 'undo-tree)
 (global-undo-tree-mode)
-(global-set-key (kbd "C--") 'undo-tree-undo)
-(global-set-key (kbd "M--") 'undo-tree-redo)
+(global-set-key (kbd "C-z") 'undo-tree-undo)
+(global-set-key (kbd "C-S-z") 'undo-tree-redo)
 
 ; Visual bookmarks
 (require 'bm)
@@ -227,14 +233,22 @@
 ;; Full screen toogle
 (global-set-key (kbd "C-S-F") 'ns-toggle-fullscreen)
 
+;; Revert buffer, will disable to mapping to list directory that I don't
+;; use
+(defun revert-buffer-no-confirm ()
+  "Revert buffer without confirmation."
+  (interactive) (revert-buffer t t))
+(global-set-key (kbd "C-x C-d") 'revert-buffer-no-confirm)
+
 ;; Global function key mappings
 ;(global-set-key (kbd "M-<f1>") (lambda () (interactive) (elscreen-goto 0)))
 ;(global-set-key (kbd "M-<f2>") (lambda () (interactive) (elscreen-goto 1)))
 ;(global-set-key (kbd "M-<f3>") (lambda () (interactive) (elscreen-goto 2)))
 (global-set-key (kbd "C-<f6>") 'magit-status)
 (global-set-key (kbd "C-<f7>") 'flymake-mode)
+(global-set-key (kbd "<f5>") 'gud-gdb)
 (global-set-key (kbd "<f7>") 'recompile)
-(global-set-key (kbd "C-<f7>") 'compile)
+;(global-set-key (kbd "C-<f7>") 'compile)
 (global-set-key (kbd "C-<f8>") 'multi-eshell)
 (global-set-key (kbd "C-<f9>") 'sunrise-cd)
 (global-set-key (kbd "C-<f2>") 'bm-toggle)
@@ -275,6 +289,7 @@
 ;; Use Ctrl-x m as a shortcut for Alt-X (execute-extended-command)
 (global-set-key (kbd "C-x C-m") 'execute-extended-command)
 (global-set-key (kbd "C-c C-m") 'execute-extended-command) ; In case I mis-type
+(global-set-key (kbd "C-x m")   'execute-extended-command) ; In case I mis-type
 
 ;: Make sure i never miss a tab char again when editing C/C++
 ;(defface extra-whitespace-face
@@ -303,19 +318,18 @@
 (setq whitespace-line-column 100)
 (global-whitespace-mode t)
 
-; FLymake
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; flymake
-(defun my-flymake-show-next-error()
-  (interactive)
-  (flymake-goto-next-error)
-  (flymake-display-err-menu-for-current-line)
-  )
 ; Show flymake errors in minibuffer
 (eval-after-load 'flymake '(require 'flymake-cursor))
 ; Use underline instead of highlight for flymake errors
 (custom-set-faces
  '(flymake-errline ((((class color)) (:underline "red"))))
  '(flymake-warnline ((((class color)) (:underline "yellow")))))
+; Enable fly make for modes that can be checked
+(add-hook 'find-file-hook 'flymake-find-file-hook)
+; Avoid the error message box where flymake is not possible
+(setq flymake-gui-warnings-enabled nil)
 (global-set-key (kbd "M-p") 'flymake-goto-prev-error)
 (global-set-key (kbd "M-n") 'flymake-goto-next-error)
 
@@ -334,7 +348,7 @@ ov)
 (bf (gud-find-file true-file)))
 (save-excursion
   (set-buffer bf)
-  (move-overlay ov (line-beginning-position) (line-end-position)
+  (move-overlay ov (line-beginning-position) (line-beginning-position 2)
   (current-buffer)))))
 
 (defun gud-kill-buffer ()
