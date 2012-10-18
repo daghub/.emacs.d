@@ -175,6 +175,13 @@
 (autoload 'mo-git-blame-file "mo-git-blame" nil t)
 (autoload 'mo-git-blame-current "mo-git-blame" nil t)
 (setq mo-git-blame-use-ido t)
+(add-hook
+ 'magit-mode-hook
+ (lambda ()
+   (require 'rebase-mode)))
+(eval-after-load 'rebase-mode
+  '(progn
+     (define-key rebase-mode-map (kbd "E") 'toggle-read-only)))
 
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
