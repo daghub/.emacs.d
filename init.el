@@ -46,8 +46,6 @@
 ;;;;;;;;;;;;;;;;;;;;
 (require 'sunrise-commander)
 (add-to-list 'auto-mode-alist '("\\.srvm\\'" . sr-virtual-mode))
-(global-set-key (kbd "C-c x") 'sunrise)
-(global-set-key (kbd "C-c X") 'sunrise-cd)
 
 ; Active google style guides for C/C++
 (require 'google-c-style)
@@ -258,6 +256,7 @@
 ;(global-set-key (kbd "C-<f7>") 'compile)
 (global-set-key (kbd "C-<f8>") 'multi-eshell)
 (global-set-key (kbd "C-<f9>") 'sunrise-cd)
+(global-set-key (kbd "<f9>") 'sunrise)
 (global-set-key (kbd "C-<f2>") 'bm-toggle)
 (global-set-key (kbd "<f2>")   'bm-next)
 (global-set-key (kbd "<S-f2>") 'bm-previous)
