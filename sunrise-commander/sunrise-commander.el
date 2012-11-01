@@ -3155,7 +3155,7 @@ as its first argument."
 
 (defun sr-find-apply (fun pattern)
   "Helper function for functions `sr-find', `sr-find-name' and `sr-find-grep'."
-  (let* ((suffix (if (eq 'w32 window-system) " {} ;" " \\{\\} \\;"))
+  (let* ((suffix (if (eq 'w32 window-system) " {} \\;" " \\{\\} \\;"))
          (find-ls-option
           (cons
            (concat "-exec ls -d " sr-virtual-listing-switches suffix)
