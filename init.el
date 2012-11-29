@@ -26,8 +26,9 @@
 (require 'color-theme-solarized)
 (color-theme-solarized-dark)
 
-;; Disable scrollbars
+;; Disable scrollbars and toolbars
 (scroll-bar-mode -1)
+(tool-bar-mode -1)
 
 ; Avoid emacs creating backup files
 (setq make-backup-files nil)
@@ -118,7 +119,6 @@
   (when gtags-mode
     (when (gtags-root-dir)
       (gtags-update-current-file))))
-(add-hook 'after-save-hook 'gtags-update-hook)
 
 (add-hook 'gtags-mode-hook
 	  (lambda() (interactive)
@@ -129,41 +129,41 @@
 (add-hook 'c-mode-common-hook
 	  (lambda ()
 	    (require 'gtags)
-	    (gtags-mode t)))
+	    (gtags-mode t)
+	    ; add a local hook
+	    (add-hook 'after-save-hook 'gtags-update-hook nil t)
+	    ))
 (setq gtags-mode 0) ;default
 ;;;;;;;
 
 ;;;;;;; auto complete
+(require 'auto-complete)
 (require 'auto-complete-config)
-;(add-to-list 'ac-dictionary-directories (concat myoptdir "AC/ac-dict"))
-(require 'auto-complete-clang)
-(setq ac-auto-start nil)
-(setq ac-quick-help-delay 0.5)
-;; (ac-set-trigger-key "TAB")
-;; (define-key ac-mode-map  [(control tab)] 'auto-complete)
-(define-key ac-mode-map  [M-tab] 'auto-complete)
-(defun my-ac-config ()
-  (setq-default ac-sources '(ac-source-abbrev ac-source-dictionary ac-source-words-in-same-mode-buffers))
-  (add-hook 'emacs-lisp-mode-hook 'ac-emacs-lisp-mode-setup)
-  (add-hook 'c-mode-common-hook 'ac-cc-mode-setup)
-  ;;(add-hook 'ruby-mode-hook 'ac-ruby-mode-setup)
-  ;;(add-hook 'css-mode-hook 'ac-css-mode-setup)
-  (add-hook 'auto-complete-mode-hook 'ac-common-setup)
-  (global-auto-complete-mode t))
-(defun my-ac-cc-mode-setup ()
-  (setq ac-sources (append '(ac-source-clang ac-source-yasnippet ac-source-gtags) ac-sources)))
-(add-hook 'c-mode-common-hook 'my-ac-cc-mode-setup)
-(my-ac-config)
+(ac-config-default)
 
-(setq ac-clang-flags-string
- "-D_DEBUG -D__cplusplus -DSP_LIBSPOTIFY=1 -DSP_WITH_SOCIAL=1 -DSP_LIBSPOTIFY_WITH_SOCIAL=1 -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug -I/Users/dag/Documents/Dev/gitrepos/libspotify/ -I/Users/dag/Documents/Dev/gitrepos/libspotify/client -I/Users/dag/Documents/Dev/gitrepos/libspotify/src -I/Users/dag/Documents/Dev/gitrepos/libspotify/client/base/lib -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/log-parser -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/boink -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/protobuf -I/Users/dag/Documents/Dev/gitrepos/libspotify/targets/Darwin-x86_64-debug/obj/passive_boink -I/Users/dag/Documents/Dev/gitrepos/libspotify/client/boink/cpp"
- )
-(setq ac-clang-flags
-      (split-string ac-clang-flags-string))
-(setq c-macro-preprocessor "cpp -xc++")
-(setq c-macro-cppflags ac-clang-flags-string)
-;;;;;;;;;
-;;;;;;;;;
+(defun ac-clang-setup()
+  (when (gtags-root-dir)
+    (defvar filename)
+    (setq filename (concat (gtags-root-dir) "/ac-config.el"))
+    (when (file-exists-p filename)
+      (load filename)
+      (require 'auto-complete-clang)
+      (setq sp-include-dirs
+	    (mapcar
+	     (lambda(d) (concat "-I" (gtags-root-dir) "/" d))
+	     sp-include-dirs
+	     )
+	    )
+      (setq ac-clang-flags
+	    (append sp-compile-flags sp-include-dirs)
+	    )
+
+      (setq ac-sources (append '(ac-source-clang) ac-sources))
+      )
+    )
+  )
+(add-hook 'c-mode-common-hook 'ac-clang-setup)
+
 
 ; Enable jumping between cpp and header file using keyboard shortcut
 (global-set-key (kbd "M-o") 'ff-find-other-file)
@@ -176,6 +176,7 @@
 
 ; uniquify - use sensibel buffer names
 (require 'uniquify)
+;(uniquify-buffer-name-style (quote post-forward-angle-brackets) nil (uniquify)))
 
 ; multi eshell support
 (require 'multi-eshell)
@@ -279,7 +280,6 @@
 (global-set-key (kbd "<S-f2>") 'bm-previous)
 (global-set-key (kbd "<f4>")   'auto-complete)
 
-;(global-set-key (kbd "C-<f4>") 'gtags-update-hook)
 
 ;; Use Ctrl-H as backspace
 ;(define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
