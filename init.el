@@ -10,6 +10,9 @@
 (add-to-list 'load-path "~/.emacs.d/color-theme-6.6.0")
 (add-to-list 'load-path "~/.emacs.d/emacs-color-theme-solarized")
 
+;; Treat .h files at c++ headers
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+
 ;; ;; Try the Menlo font
 ;; (custom-set-faces
 ;;   ;; custom-set-faces was added by Custom.
@@ -44,8 +47,43 @@
 ;;;;;;;;;;;;;;;;;;;;
 ;; Sunrise commander
 ;;;;;;;;;;;;;;;;;;;;
+
+;; Disable the commander style function keys. They are used for other purposes.
+;(setq sr-use-commander-keys nil)
 (require 'sunrise-commander)
+;(require 'sunrise-x-buttons) ; some extra help
 (add-to-list 'auto-mode-alist '("\\.srvm\\'" . sr-virtual-mode))
+; Open file with b in default application instead of in default browser
+(defun sr-browse-file (&optional file)
+  "Display the selected file with the default appication."
+  (interactive)
+  (setq file (or file (dired-get-filename)))
+  (save-selected-window
+    (sr-select-viewer-window)
+    (let ((buff (current-buffer))
+	  (fname (if (file-directory-p file)
+		     file
+		   (file-name-nondirectory file)))
+	  (app (cond
+		((eq system-type 'darwin)	"open %s")
+		((eq system-type 'windows-nt)	"open %s")
+		(t				"xdg-open %s"))))
+      (start-process-shell-command "open" nil (format app file))
+      (unless (eq buff (current-buffer))
+        (sr-scrollable-viewer (current-buffer)))
+      (message "Opening \"%s\" ..." fname))))
+
+
+; Call on surise commander from ido
+(defun ido-sunrise ()
+  "Call `sunrise' the ido way.
+    The directory is selected interactively by typing a substring.
+    For details on keybindings, see `ido-find-file'."
+  (interactive)
+  (let ((ido-report-no-match nil)
+        (ido-auto-merge-work-directories-length -1))
+    (ido-file-internal 'sr-dired 'sr-dired nil "Sunrise: " 'dir)))
+(define-key (cdr (assoc 'ido-mode minor-mode-map-alist)) [remap dired] 'ido-sunrise)
 
 ; Active google style guides for C/C++
 (require 'google-c-style)
@@ -57,6 +95,8 @@
 (setq special-display-regexps (remove "[ ]?\\*[hH]elp.*" special-display-regexps))
 
 ;;;;;;; GNU Global
+; Set the environment variable that makes .h mean C++ header rather than C header
+(setenv "GTAGSFORCECPP" "1")
 (defun gtags-root-dir ()
    "Returns GTAGS root directory or nil if doesn't exist."
    (with-temp-buffer
@@ -80,11 +120,10 @@
       (gtags-update-current-file))))
 (add-hook 'after-save-hook 'gtags-update-hook)
 
-(add-hook 'gtags-mode-hook 
+(add-hook 'gtags-mode-hook
 	  (lambda() (interactive)
-	    (local-set-key (kbd "M-.") 'gtags-find-tag)
-	    (local-set-key (kbd "M-,") 'gtags-find-rtag)
-	    (local-set-key (kbd "C-M-,") 'gtags-find-symbol)
+	    (local-set-key (kbd "M-.") 'gtags-find-tag-from-here)
+	    (local-set-key (kbd "M-,") 'gtags-find-with-grep)
 	    ))
 
 (add-hook 'c-mode-common-hook
@@ -164,11 +203,9 @@
 		("\\.cmake\\'" . cmake-mode))
 	      auto-mode-alist))
 
-; Egg - Emacs interface to git
-;(require 'egg)
-
 ; Magit - Emacs interface to git
 (require 'magit)
+(require 'magit-blame)
 (autoload 'magit-status "magit" nil t)
 (autoload 'mo-git-blame-file "mo-git-blame" nil t)
 (autoload 'mo-git-blame-current "mo-git-blame" nil t)
@@ -180,19 +217,12 @@
 (eval-after-load 'rebase-mode
   '(progn
      (define-key rebase-mode-map (kbd "E") 'toggle-read-only)))
-
-(custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(tool-bar-mode nil)
- '(uniquify-buffer-name-style (quote post-forward-angle-brackets) nil (uniquify)))
-(custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+(add-hook
+ 'magit-log-edit-mode-hook
+ (lambda ()
+   (set (make-local-variable 'whitespace-line-column) 65)
+   (whitespace-mode t)
+   )
  )
 
 ;; indent whole buffer. M-x iwb
@@ -202,19 +232,6 @@
   (delete-trailing-whitespace)
   (indent-region (point-min) (point-max) nil)
   (untabify (point-min) (point-max)))
-
-
-; Activate elscreen with independent most-recently-used-buffer-lists
-;(require 'elscreen-buffer-list)
-
-
-(require 'buffer-stack)
-;(global-set-key [(f9)] 'buffer-stack-bury)
-;(global-set-key [(control f9)] 'buffer-stack-bury-and-kill)
-;(global-set-key [(f10)] 'buffer-stack-up)
-(global-set-key [(control f11)] 'buffer-stack-down)
-(global-set-key [(control f12)] 'buffer-stack-track)
-;(global-set-key [(control f12)] 'buffer-stack-untrack)
 
 ; Undo-tree
 (require 'undo-tree)
@@ -233,6 +250,7 @@
 ;(setq mac-option-key-is-meta t)
 ;(setq mac-right-option-modifier nil)
 (setq mac-option-modifier 'meta)
+(setq mac-right-option-modifier nil)
 (setq mac-command-modifier 'ctrl)
 
 ;; Full screen toogle
@@ -246,11 +264,10 @@
 (global-set-key (kbd "C-x C-d") 'revert-buffer-no-confirm)
 
 ;; Global function key mappings
-;(global-set-key (kbd "M-<f1>") (lambda () (interactive) (elscreen-goto 0)))
-;(global-set-key (kbd "M-<f2>") (lambda () (interactive) (elscreen-goto 1)))
-;(global-set-key (kbd "M-<f3>") (lambda () (interactive) (elscreen-goto 2)))
 (global-set-key (kbd "C-<f6>") 'magit-status)
-(global-set-key (kbd "C-<f7>") 'flymake-mode)
+(global-set-key (kbd "C-<f3>") 'flymake-mode)
+(global-set-key (kbd "S-<f3>") 'flymake-goto-prev-error)
+(global-set-key (kbd "<f3>") 'flymake-goto-next-error)
 (global-set-key (kbd "<f5>") 'gud-gdb)
 (global-set-key (kbd "<f7>") 'recompile)
 ;(global-set-key (kbd "C-<f7>") 'compile)
@@ -282,16 +299,6 @@
     (backward-kill-word arg)))
 (global-set-key (kbd "C-w") 'kill-region-or-backward-kill-word)
 
-;; Make ALT-key function for entering some special characters on a Mac keyboard
-(global-set-key (kbd "M-2") (lambda() (interactive) (insert "@")))
-(global-set-key (kbd "M-8") (lambda() (interactive) (insert "[")))
-(global-set-key (kbd "M-9") (lambda() (interactive) (insert "]")))
-(global-set-key (kbd "M-(") (lambda() (interactive) (insert "{")))
-(global-set-key (kbd "M-)") (lambda() (interactive) (insert "}")))
-(global-set-key (kbd "M-4") (lambda() (interactive) (insert "$")))
-(global-set-key (kbd "M-/") (lambda() (interactive) (insert "\\")))
-(global-set-key (kbd "M-7") (lambda() (interactive) (insert "|")))
-
 ;; Use Ctrl-x m as a shortcut for Alt-X (execute-extended-command)
 (global-set-key (kbd "C-x C-m") 'execute-extended-command)
 (global-set-key (kbd "C-c C-m") 'execute-extended-command) ; In case I mis-type
@@ -305,12 +312,8 @@
 ;  '(("\t" . 'extra-whitespace-face)))
 ;(add-hook 'c-mode-common-hook
 ;	  (lambda () (font-lock-add-keywords nil my-extra-keywords)))
-; Set the cursor to wide, covering a whole tab
-;(setq x-stretch-cursor t)
 
 ;; Turn off sound beep
-;(setq bell-volume 0)
-;(setq sound-alist nil)
 (setq ring-bell-function 'ignore)
 
 
@@ -323,21 +326,33 @@
 (setq whitespace-style '(face empty tabs lines-tail trailing tab-mark))
 (setq whitespace-line-column 100)
 (global-whitespace-mode t)
+;(global-whitespace-newline-mode t)
+;; make whitespace-mode use just basic coloring
+;(setq whitespace-style (quote (spaces tabs newline space-mark tab-mark newline-mark)))
+
+;; Delete all trailing whitespace when saving
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; flymake
 ; Show flymake errors in minibuffer
 (eval-after-load 'flymake '(require 'flymake-cursor))
-; Use underline instead of highlight for flymake errors
+
+(add-hook 'c-mode-common-hook
+	  (function (lambda()
+		      (flymake-mode t)
+		      )
+		    )
+	  )
+
 (custom-set-faces
- '(flymake-errline ((((class color)) (:underline "red"))))
- '(flymake-warnline ((((class color)) (:underline "yellow")))))
-; Enable fly make for modes that can be checked
-(add-hook 'find-file-hook 'flymake-find-file-hook)
+ '(flymake-errline ((((class color)) (:underline "orange"))))
+ '(flymake-warnline ((((class color)) (:underline "yellow"))))
+)
+
+
 ; Avoid the error message box where flymake is not possible
 (setq flymake-gui-warnings-enabled nil)
-(global-set-key (kbd "M-p") 'flymake-goto-prev-error)
-(global-set-key (kbd "M-n") 'flymake-goto-next-error)
 
 ;;-------------
 ;;Add color to the current GUD line (obrigado google)
@@ -363,5 +378,3 @@ ov)
 
 (add-hook 'kill-buffer-hook 'gud-kill-buffer)
 ;;-------------------------------------------------------------
-
-
