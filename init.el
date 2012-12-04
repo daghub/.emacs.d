@@ -13,14 +13,8 @@
 ;; Treat .h files at c++ headers
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
-;; ;; Try the Menlo font
-;; (custom-set-faces
-;;   ;; custom-set-faces was added by Custom.
-;;   ;; If you edit it by hand, you could mess it up, so be careful.
-;;   ;; Your init file should contain only one such instance.
-;;   ;; If there is more than one, they won't work right.
-;;  '(default ((t (:height 120 :family "Menlo"))))
-;;  '(font-lock-comment-face ((t (:foreground "#3f7f5f")))))
+;; RFringe, to show fringe indications for example for flymake
+(require 'rfringe)
 
 ;; Color theme
 (require 'color-theme-solarized)
@@ -44,6 +38,10 @@
 (autoload 'idomenu "idomenu" nil t)
 (add-hook 'c-mode-common-hook 'imenu-add-menubar-index)
 (global-set-key (kbd "M-i") 'idomenu)
+
+;; Install fic (Fixme-in-comments) that will highlight TODO/FIXME/BUG
+(require 'fic-ext-mode)
+(add-hook 'c-mode-common-hook 'fic-ext-mode)
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Sunrise commander
@@ -140,6 +138,7 @@
 (require 'auto-complete)
 (require 'auto-complete-config)
 (ac-config-default)
+(setq ac-stop-flymake-on-completing t)
 
 (defun ac-clang-setup()
   (when (gtags-root-dir)
@@ -158,7 +157,12 @@
 	    (append sp-compile-flags sp-include-dirs)
 	    )
 
-      (setq ac-sources (append '(ac-source-clang) ac-sources))
+      (add-to-list 'ac-omni-completion-sources
+      		   (cons "\\." '(ac-source-clang)))
+      (add-to-list 'ac-omni-completion-sources
+      		   (cons "->" '(ac-source-clang)))
+      (setq clang-completion-suppress-error t)
+      (setq ac-sources '(ac-source-clang))
       )
     )
   )
@@ -274,7 +278,7 @@
 ;(global-set-key (kbd "C-<f7>") 'compile)
 (global-set-key (kbd "C-<f8>") 'multi-eshell)
 (global-set-key (kbd "C-<f9>") 'sunrise-cd)
-(global-set-key (kbd "<f9>") 'sunrise)
+(global-set-key (kbd "<f9>")   'sunrise)
 (global-set-key (kbd "C-<f2>") 'bm-toggle)
 (global-set-key (kbd "<f2>")   'bm-next)
 (global-set-key (kbd "<S-f2>") 'bm-previous)
@@ -331,7 +335,7 @@
 ;(setq whitespace-style (quote (spaces tabs newline space-mark tab-mark newline-mark)))
 
 ;; Delete all trailing whitespace when saving
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+;(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; flymake
@@ -378,3 +382,4 @@ ov)
 
 (add-hook 'kill-buffer-hook 'gud-kill-buffer)
 ;;-------------------------------------------------------------
+
