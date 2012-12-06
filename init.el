@@ -225,7 +225,7 @@
 (add-hook
  'magit-log-edit-mode-hook
  (lambda ()
-   (set (make-local-variable 'whitespace-line-column) 65)
+   (set (make-local-variable 'whitespace-line-column) 72)
    (whitespace-mode t)
    )
  )
@@ -293,15 +293,34 @@
 (define-key key-translation-map (kbd "C-ö") 'beginning-of-buffer)
 (define-key key-translation-map (kbd "C-ä") 'end-of-buffer)
 
-;; Make Ctrl-W function as backward-kill-word if region is not active
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Make Ctrl-W function as backward-delete-word if region is not active
+(defun delete-word (arg)
+  "Delete characters forward until encountering the end of a word.
+With argument, do this that many times."
+  (interactive "p")
+  (delete-region (point) (progn (forward-word arg) (point))))
+
+(defun backward-delete-word (arg)
+  "Delete characters backward until encountering the end of a word.
+With argument, do this that many times."
+  (interactive "p")
+  (delete-word (- arg)))
+
 (defun kill-region-or-backward-kill-word (&optional arg region)
   "`kill-region' if the region is active, otherwise `backward-kill-word'"
   (interactive
    (list (prefix-numeric-value current-prefix-arg) (use-region-p)))
   (if region
       (kill-region (region-beginning) (region-end))
-    (backward-kill-word arg)))
+    (backward-delete-word arg)))
+(dolist (cmd '(delete-word backward-delete-word))
+  (put cmd 'CUA 'move))
 (global-set-key (kbd "C-w") 'kill-region-or-backward-kill-word)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Delete a region if a key is pressed
+(delete-selection-mode t)
 
 ;; Use Ctrl-x m as a shortcut for Alt-X (execute-extended-command)
 (global-set-key (kbd "C-x C-m") 'execute-extended-command)
@@ -335,7 +354,7 @@
 ;(setq whitespace-style (quote (spaces tabs newline space-mark tab-mark newline-mark)))
 
 ;; Delete all trailing whitespace when saving
-;(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; flymake
@@ -383,3 +402,42 @@ ov)
 (add-hook 'kill-buffer-hook 'gud-kill-buffer)
 ;;-------------------------------------------------------------
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Compilation window. Hides the window after a second if successful
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun kill-compile-buffer-if-successful (buffer string)
+  " kill a compilation buffer if succeeded without warnings "
+  (if (and
+       (string-match "compilation" (buffer-name buffer))
+       (string-match "finished" string)
+       (not
+        (with-current-buffer buffer
+          (search-forward "warning" nil t))))
+      (run-with-timer 1 nil
+                      'kill-buffer
+                      buffer)))
+(add-hook 'compilation-finish-functions 'kill-compile-buffer-if-successful)
+; Automatically scroll the output to the first error
+(setq compilation-scroll-output 'first-error)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Enable isearch-like editing
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'iedit)
+(defun iedit-dwim (arg)
+  "Starts iedit but uses \\[narrow-to-defun] to limit its scope."
+  (interactive "P")
+  (if arg
+      (iedit-mode)
+    (save-excursion
+      (save-restriction
+        (widen)
+        ;; this function determines the scope of `iedit-start'.
+        (narrow-to-defun)
+        (if iedit-mode
+            (iedit-done)
+          ;; `current-word' can of course be replaced by other
+          ;; functions.
+          (iedit-start (current-word)))))))
+
+(global-set-key (kbd "C-;") 'iedit-dwim)
