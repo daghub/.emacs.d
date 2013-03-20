@@ -13,9 +13,6 @@
 ;; Treat .h files at c++ headers
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
-;; RFringe, to show fringe indications for example for flymake
-(require 'rfringe)
-
 ;; Color theme
 (require 'color-theme-solarized)
 (color-theme-solarized-dark)
@@ -102,10 +99,13 @@
      (if (zerop (call-process "global" nil t nil "-pr"))
  	(buffer-substring (point-min) (1- (point-max)))
        nil)))
+(defun gtags-update-all ()
+   "Update Gtags database for changes"
+   (interactive)
+   (start-process "update-gtags" "update-gtags" "bash" "-c" (concat "cd " (gtags-root-dir) " ; gtags -c -i")))
 (defun gtags-update-single(filename)
    "Update Gtags database for changes in a single file"
-   (interactive)
-   (start-process "update-gtags" "update-gtags" "bash" "-c" (concat "cd " (gtags-root-dir) " ; gtags --single-update " filename )))
+   (start-process "update-gtags" "update-gtags" "bash" "-c" (concat "cd " (gtags-root-dir) " ; gtags -c --single-update " filename )))
 (defun gtags-update-current-file()
   (interactive)
   (defvar filename)
@@ -168,6 +168,8 @@
   )
 (add-hook 'c-mode-common-hook 'ac-clang-setup)
 
+; Enable objective-C mode for .mm files automatically
+(add-to-list 'auto-mode-alist '("\\.mm$" . objc-mode))
 
 ; Enable jumping between cpp and header file using keyboard shortcut
 (global-set-key (kbd "M-o") 'ff-find-other-file)
@@ -225,7 +227,7 @@
 (add-hook
  'magit-log-edit-mode-hook
  (lambda ()
-   (set (make-local-variable 'whitespace-line-column) 72)
+   (set (make-local-variable 'whitespace-line-column) 70)
    (whitespace-mode t)
    )
  )
@@ -440,4 +442,4 @@ ov)
           ;; functions.
           (iedit-start (current-word)))))))
 
-(global-set-key (kbd "C-;") 'iedit-dwim)
+(global-set-key (kbd "C-;") 'iedit-mode)
