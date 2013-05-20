@@ -1,4 +1,9 @@
 ; Emacs config file
+(server-start) ;; allow emacs-client to connect
+
+;; Hide splash-screen and startup-message
+(setq inhibit-splash-screen t)
+(setq inhibit-startup-message t)
 
 ; Add load directory
 (add-to-list 'load-path "~/.emacs.d/")
@@ -8,18 +13,27 @@
 (add-to-list 'load-path "~/.emacs.d/magit")
 (add-to-list 'load-path "~/.emacs.d/mo-git-blame")
 (add-to-list 'load-path "~/.emacs.d/color-theme-6.6.0")
-(add-to-list 'load-path "~/.emacs.d/emacs-color-theme-solarized")
+;(add-to-list 'load-path "~/.emacs.d/emacs-color-theme-solarized")
+(add-to-list 'load-path "~/.emacs.d/darkroom")
+(add-to-list 'load-path "~/.emacs.d/emacs-google-this")
+(add-to-list 'load-path "~/.emacs.d/auto-complete-etags")
 
 ;; Treat .h files at c++ headers
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
 ;; Color theme
-(require 'color-theme-solarized)
-(color-theme-solarized-dark)
+(add-to-list 'custom-theme-load-path "~/.emacs.d/emacs-color-theme-solarized/")
+;(load-theme 'solarized-dark t)
+(add-to-list 'custom-theme-load-path "~/.emacs.d/zenburn-emacs/")
+;(require 'color-theme-solarized)
+;(color-theme-solarized-dark)
+(load-theme 'zenburn t)
+
 
 ;; Disable scrollbars and toolbars
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
+;(menu-bar-mode -1)
 
 ; Avoid emacs creating backup files
 (setq make-backup-files nil)
@@ -32,13 +46,37 @@
 (setq ido-use-filename-at-point 'guess)
 (ido-mode t)
 ; idomenu allows ido to search iMenu results for a buffer
-(autoload 'idomenu "idomenu" nil t)
-(add-hook 'c-mode-common-hook 'imenu-add-menubar-index)
-(global-set-key (kbd "M-i") 'idomenu)
+;(autoload 'idomenu "idomenu" nil t)
+;(add-hook 'c-mode-common-hook 'imenu-add-menubar-index)
+;(global-set-key (kbd "M-i") 'idomenu)
 
 ;; Install fic (Fixme-in-comments) that will highlight TODO/FIXME/BUG
 (require 'fic-ext-mode)
 (add-hook 'c-mode-common-hook 'fic-ext-mode)
+
+;; Csharp-mode
+(autoload 'csharp-mode "csharp-mode" "Major mode for editing C# code." t)
+(setq auto-mode-alist
+      (append '(("\\.cs$" . csharp-mode)) auto-mode-alist))
+(defun my-csharp-mode-fn ()
+  "function that runs when csharp-mode is initialized for a buffer."
+  (turn-on-auto-revert-mode)
+  (setq indent-tabs-mode nil)
+  ;(setq tab-width 4)
+  ;(setq c-basic-offset 4)
+  (auto-complete-mode t)
+  (make-local-variable 'ac-sources)
+  (add-to-list 'ac-sources 'ac-source-etags)
+  (require 'flymake)
+  (flymake-mode 1)
+  ;(require 'yasnippet)
+  ;(yas/minor-mode-on)
+  ;(setq auto-completion-source 'etags)
+  ;(define-key csharp-mode-map (kbd "<f4>") 'complete-etags)
+  ;(define-key csharp-mode-map (kbd "C-<f4>") 'auto-completion-mode)
+;;  ;;(require 'rfringe)
+  )
+(add-hook  'csharp-mode-hook 'my-csharp-mode-fn)
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Sunrise commander
@@ -82,91 +120,52 @@
 (define-key (cdr (assoc 'ido-mode minor-mode-map-alist)) [remap dired] 'ido-sunrise)
 
 ; Active google style guides for C/C++
-(require 'google-c-style)
+;(require 'google-c-style)
 
-(add-hook 'c-mode-common-hook 'google-set-c-style)
-(add-hook 'c-mode-common-hook 'google-make-newline-indent)
+;(add-hook 'c-mode-common-hook 'google-set-c-style)
+;(add-hook 'c-mode-common-hook 'google-make-newline-indent)
 
 ;; open *help* in current frame
 (setq special-display-regexps (remove "[ ]?\\*[hH]elp.*" special-display-regexps))
 
-;;;;;;; GNU Global
-; Set the environment variable that makes .h mean C++ header rather than C header
-(setenv "GTAGSFORCECPP" "1")
-(defun gtags-root-dir ()
-   "Returns GTAGS root directory or nil if doesn't exist."
-   (with-temp-buffer
-     (if (zerop (call-process "global" nil t nil "-pr"))
- 	(buffer-substring (point-min) (1- (point-max)))
-       nil)))
-(defun gtags-update-all ()
-   "Update Gtags database for changes"
-   (interactive)
-   (start-process "update-gtags" "update-gtags" "bash" "-c" (concat "cd " (gtags-root-dir) " ; gtags -c -i")))
-(defun gtags-update-single(filename)
-   "Update Gtags database for changes in a single file"
-   (start-process "update-gtags" "update-gtags" "bash" "-c" (concat "cd " (gtags-root-dir) " ; gtags -c --single-update " filename )))
-(defun gtags-update-current-file()
-  (interactive)
-  (defvar filename)
-  (setq filename (replace-regexp-in-string (gtags-root-dir) "." (buffer-file-name (current-buffer))))
-  (gtags-update-single filename)
-  (message "Gtags updated for %s" filename))
-(defun gtags-update-hook()
-  "Update GTAGS file incrementally upon saving a file"
-  (when gtags-mode
-    (when (gtags-root-dir)
-      (gtags-update-current-file))))
-
-(add-hook 'gtags-mode-hook
-	  (lambda() (interactive)
-	    (local-set-key (kbd "M-.") 'gtags-find-tag-from-here)
-	    (local-set-key (kbd "M-,") 'gtags-find-with-grep)
-	    ))
-
-(add-hook 'c-mode-common-hook
-	  (lambda ()
-	    (require 'gtags)
-	    (gtags-mode t)
-	    ; add a local hook
-	    (add-hook 'after-save-hook 'gtags-update-hook nil t)
-	    ))
-(setq gtags-mode 0) ;default
-;;;;;;;
 
 ;;;;;;; auto complete
+;(require 'completion-ui)
+;(autoload 'auto-completion-mode "auto-completion-mode" "a" t)
+
 (require 'auto-complete)
 (require 'auto-complete-config)
 (ac-config-default)
 (setq ac-stop-flymake-on-completing t)
+(require 'auto-complete-etags)
 
-(defun ac-clang-setup()
-  (when (gtags-root-dir)
-    (defvar filename)
-    (setq filename (concat (gtags-root-dir) "/ac-config.el"))
-    (when (file-exists-p filename)
-      (load filename)
-      (require 'auto-complete-clang)
-      (setq sp-include-dirs
-	    (mapcar
-	     (lambda(d) (concat "-I" (gtags-root-dir) "/" d))
-	     sp-include-dirs
-	     )
-	    )
-      (setq ac-clang-flags
-	    (append sp-compile-flags sp-include-dirs)
-	    )
+;; (defun ac-clang-setup()
+;;   (when (gtags-root-dir)
+;;     (defvar filename)
+;;     (setq filename (concat (gtags-root-dir) "/ac-config.el"))
+;;     (when (file-exists-p filename)
+;;       (load filename)
+;;       (require 'auto-complete-clang)
+;;       (setq sp-include-dirs
+;; 	    (mapcar
+;; 	     (lambda(d) (concat "-I" (gtags-root-dir) "/" d))
+;; 	     sp-include-dirs
+;; 	     )
+;; 	    )
+;;       (setq ac-clang-flags
+;; 	    (append sp-compile-flags sp-include-dirs)
+;; 	    )
 
-      (add-to-list 'ac-omni-completion-sources
-      		   (cons "\\." '(ac-source-clang)))
-      (add-to-list 'ac-omni-completion-sources
-      		   (cons "->" '(ac-source-clang)))
-      (setq clang-completion-suppress-error t)
-      (setq ac-sources '(ac-source-clang))
-      )
-    )
-  )
-(add-hook 'c-mode-common-hook 'ac-clang-setup)
+;;       (add-to-list 'ac-omni-completion-sources
+;;       		   (cons "\\." '(ac-source-clang)))
+;;       (add-to-list 'ac-omni-completion-sources
+;;       		   (cons "->" '(ac-source-clang)))
+;;       (setq clang-completion-suppress-error t)
+;;       (setq ac-sources '(ac-source-clang))
+;;       )
+;;     )
+;;   )
+;; (add-hook 'c-mode-common-hook 'ac-clang-setup)
 
 ; Enable objective-C mode for .mm files automatically
 (add-to-list 'auto-mode-alist '("\\.mm$" . objc-mode))
@@ -213,6 +212,7 @@
 ; Magit - Emacs interface to git
 (require 'magit)
 (require 'magit-blame)
+(require 'magit-svn)
 (autoload 'magit-status "magit" nil t)
 (autoload 'mo-git-blame-file "mo-git-blame" nil t)
 (autoload 'mo-git-blame-current "mo-git-blame" nil t)
@@ -221,6 +221,10 @@
  'magit-mode-hook
  (lambda ()
    (require 'rebase-mode)))
+(add-hook
+ 'magit-mode-hook
+ (lambda ()
+   (turn-on-magit-svn)))
 (eval-after-load 'rebase-mode
   '(progn
      (define-key rebase-mode-map (kbd "E") 'toggle-read-only)))
@@ -285,7 +289,6 @@
 (global-set-key (kbd "<f2>")   'bm-next)
 (global-set-key (kbd "<S-f2>") 'bm-previous)
 (global-set-key (kbd "<f4>")   'auto-complete)
-
 
 ;; Use Ctrl-H as backspace
 ;(define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
@@ -356,7 +359,7 @@ With argument, do this that many times."
 ;(setq whitespace-style (quote (spaces tabs newline space-mark tab-mark newline-mark)))
 
 ;; Delete all trailing whitespace when saving
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+;(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; flymake
@@ -371,9 +374,12 @@ With argument, do this that many times."
 	  )
 
 (custom-set-faces
- '(flymake-errline ((((class color)) (:underline "orange"))))
- '(flymake-warnline ((((class color)) (:underline "yellow"))))
-)
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(flymake-errline ((((class color)) (:underline "orange"))) t)
+ '(flymake-warnline ((((class color)) (:underline "yellow"))) t))
 
 
 ; Avoid the error message box where flymake is not possible
@@ -451,13 +457,13 @@ ov)
 ;; under Windows and c:\cygwin exists. Assumes that C:\cygwin\bin is
 ;; not already in your Windows Path (it generally should not be).
 ;;
-(let* ((cygwin-root "c:/cygwin")
-       (cygwin-bin (concat cygwin-root "/bin")))
+(let* ((bintools-root "C:/Program Files (x86)/Git")
+       (bintools-bin (concat bintools-root "/bin")))
   (when (and (eq 'windows-nt system-type)
-  	     (file-readable-p cygwin-root))
+  	     (file-readable-p bintools-root))
 
-    (setq exec-path (cons cygwin-bin exec-path))
-    (setenv "PATH" (concat cygwin-bin ";" (getenv "PATH")))
+    (setq exec-path (cons bintools-bin exec-path))
+    (setenv "PATH" (concat (concat bintools-bin ";") (getenv "PATH")))
 
     ;; By default use the Windows HOME.
     ;; Otherwise, uncomment below to set a HOME
@@ -469,4 +475,18 @@ ov)
     (setq explicit-shell-file-name shell-file-name)
     ;; This removes unsightly ^M characters that would otherwise
     ;; appear in the output of java applications.
-    (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)))
+    (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)
+    (require 'darkroom-mode)
+    (global-set-key (kbd "<f11>") 'w32-fullscreen)
+))
+
+(require 'google-this)
+(google-this-mode 1)
+(global-set-key (kbd "C-x g") 'google-this-mode-submap)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes (quote ("1e7e097ec8cb1f8c3a912d7e1e0331caeed49fef6cff220be63bd2a6ba4cc365" "fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" "a81fbcd4c2903eca49c448680055afc1a0e534bf454f2d83edbfc5e4259aa789" default))))
