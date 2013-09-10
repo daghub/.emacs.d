@@ -13,3 +13,6 @@
 [submodule "auto-complete-etags"]
 	path = auto-complete-etags
 	url = git@github.com:whitypig/auto-complete-etags.git
+[submodule "plantuml-mode"]
+	path = plantuml-mode
+	url = https://github.com/zwz/plantuml-mode.git

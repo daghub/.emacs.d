@@ -17,17 +17,18 @@
 (add-to-list 'load-path "~/.emacs.d/darkroom")
 (add-to-list 'load-path "~/.emacs.d/emacs-google-this")
 (add-to-list 'load-path "~/.emacs.d/auto-complete-etags")
+(add-to-list 'load-path "~/.emacs.d/plantuml-mode")
 
 ;; Treat .h files at c++ headers
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
 ;; Color theme
 (add-to-list 'custom-theme-load-path "~/.emacs.d/emacs-color-theme-solarized/")
-;(load-theme 'solarized-dark t)
-(add-to-list 'custom-theme-load-path "~/.emacs.d/zenburn-emacs/")
+(load-theme 'solarized-dark t)
+;(add-to-list 'custom-theme-load-path "~/.emacs.d/zenburn-emacs/")
 ;(require 'color-theme-solarized)
 ;(color-theme-solarized-dark)
-(load-theme 'zenburn t)
+;(load-theme 'zenburn t)
 
 
 ;; Disable scrollbars and toolbars
@@ -53,6 +54,18 @@
 ;; Install fic (Fixme-in-comments) that will highlight TODO/FIXME/BUG
 (require 'fic-ext-mode)
 (add-hook 'c-mode-common-hook 'fic-ext-mode)
+
+;; PlantUML mode
+(autoload 'plantuml-mode "plantuml-mode" nil t)
+(setq auto-mode-alist
+      (append '(("\\.uml$" . plantuml-mode)) auto-mode-alist))
+;; active Org-babel languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(;; other Babel languages
+   (plantuml . t)))
+(setq org-plantuml-jar-path
+      (expand-file-name "~/plantuml.jar"))
 
 ;; Csharp-mode
 (autoload 'csharp-mode "csharp-mode" "Major mode for editing C# code." t)
@@ -353,13 +366,10 @@ With argument, do this that many times."
 (require 'whitespace)
 (setq whitespace-style '(face empty tabs lines-tail trailing tab-mark))
 (setq whitespace-line-column 100)
-(global-whitespace-mode t)
-;(global-whitespace-newline-mode t)
-;; make whitespace-mode use just basic coloring
-;(setq whitespace-style (quote (spaces tabs newline space-mark tab-mark newline-mark)))
+;;(global-whitespace-mode t)
 
-;; Delete all trailing whitespace when saving
-;(add-hook 'before-save-hook 'delete-trailing-whitespace)
+; try to improve slow performance on windows.
+(setq w32-get-true-file-attributes nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; flymake
@@ -378,8 +388,8 @@ With argument, do this that many times."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(flymake-errline ((((class color)) (:underline "orange"))) t)
- '(flymake-warnline ((((class color)) (:underline "yellow"))) t))
+ '(flymake-errline ((((class color)) (:underline "orange"))))
+ '(flymake-warnline ((((class color)) (:underline "yellow")))))
 
 
 ; Avoid the error message box where flymake is not possible
@@ -483,6 +493,16 @@ ov)
 (require 'google-this)
 (google-this-mode 1)
 (global-set-key (kbd "C-x g") 'google-this-mode-submap)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org-mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'org-install)
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+;(define-key global-map "\C-cl" 'org-store-link)
+;(define-key global-map "\C-ca" 'org-agenda)
+(setq org-log-done t)
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
