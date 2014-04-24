@@ -1,5 +1,5 @@
 ; Emacs config file
-(server-start) ;; allow emacs-client to connect
+;(server-start) ;; allow emacs-client to connect
 
 ;; Hide splash-screen and startup-message
 (setq inhibit-splash-screen t)
@@ -461,12 +461,33 @@ ov)
 (global-set-key (kbd "C-;") 'iedit-mode)
 
 ;;;;
-;;;; cygwin support
+;;;; Windows stuff
 ;;;;
-;; Sets your shell to use cygwin's bash, if Emacs finds it's running
-;; under Windows and c:\cygwin exists. Assumes that C:\cygwin\bin is
-;; not already in your Windows Path (it generally should not be).
 ;;
+(defvar my-fullscreen-p t "Check if fullscreen is on or off")
+
+(defun my-non-fullscreen ()
+  (interactive)
+  (if (fboundp 'w32-send-sys-command)
+	  ;; WM_SYSCOMMAND restore #xf120
+	  (w32-send-sys-command 61728)
+	(progn (set-frame-parameter nil 'width 82)
+		   (set-frame-parameter nil 'fullscreen 'fullheight))))
+
+(defun my-fullscreen ()
+  (interactive)
+  (if (fboundp 'w32-send-sys-command)
+	  ;; WM_SYSCOMMAND maximaze #xf030
+	  (w32-send-sys-command 61488)
+	(set-frame-parameter nil 'fullscreen 'fullboth)))
+
+(defun my-toggle-fullscreen ()
+  (interactive)
+  (setq my-fullscreen-p (not my-fullscreen-p))
+  (if my-fullscreen-p
+	  (my-non-fullscreen)
+	(my-fullscreen)))
+
 (let* ((bintools-root "C:/Program Files (x86)/Git")
        (bintools-bin (concat bintools-root "/bin")))
   (when (and (eq 'windows-nt system-type)
@@ -479,15 +500,14 @@ ov)
     ;; Otherwise, uncomment below to set a HOME
     ;;      (setenv "HOME" (concat cygwin-root "/home/eric"))
 
-    ;; NT-emacs assumes a Windows shell. Change to baash.
+    ;; NT-emacs assumes a Windows shell. Change to bash.
     (setq shell-file-name "bash")
     (setenv "SHELL" shell-file-name)
     (setq explicit-shell-file-name shell-file-name)
     ;; This removes unsightly ^M characters that would otherwise
     ;; appear in the output of java applications.
     (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)
-    (require 'darkroom-mode)
-    (global-set-key (kbd "<f11>") 'w32-fullscreen)
+    (global-set-key (kbd "<f11>") 'my-toggle-fullscreen)
 ))
 
 (require 'google-this)
