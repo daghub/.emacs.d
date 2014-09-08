@@ -1,5 +1,5 @@
 ; Emacs config file
-;(server-start) ;; allow emacs-client to connect
+(server-start) ;; allow emacs-client to connect
 
 ;; Hide splash-screen and startup-message
 (setq inhibit-splash-screen t)
@@ -9,13 +9,8 @@
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/apel-10.8")
 (add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
-(add-to-list 'load-path "~/.emacs.d/sunrise-commander")
 (add-to-list 'load-path "~/.emacs.d/magit")
-(add-to-list 'load-path "~/.emacs.d/mo-git-blame")
-(add-to-list 'load-path "~/.emacs.d/color-theme-6.6.0")
-;(add-to-list 'load-path "~/.emacs.d/emacs-color-theme-solarized")
-(add-to-list 'load-path "~/.emacs.d/darkroom")
-(add-to-list 'load-path "~/.emacs.d/emacs-google-this")
+(add-to-list 'load-path "~/.emacs.d/git-modes")
 (add-to-list 'load-path "~/.emacs.d/auto-complete-etags")
 (add-to-list 'load-path "~/.emacs.d/plantuml-mode")
 
@@ -23,13 +18,8 @@
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
 ;; Color theme
-(add-to-list 'custom-theme-load-path "~/.emacs.d/emacs-color-theme-solarized/")
-(load-theme 'solarized-dark t)
-;(add-to-list 'custom-theme-load-path "~/.emacs.d/zenburn-emacs/")
-;(require 'color-theme-solarized)
-;(color-theme-solarized-dark)
-;(load-theme 'zenburn t)
-
+;(add-to-list 'custom-theme-load-path "~/.emacs.d/emacs-color-theme-solarized/")
+(load-theme 'deeper-blue t)
 
 ;; Disable scrollbars and toolbars
 (scroll-bar-mode -1)
@@ -44,12 +34,9 @@
 (require 'ido)
 (setq ido-enable-flex-matching t)
 (setq ido-everywhere t)
-(setq ido-use-filename-at-point 'guess)
+(setq ido-create-new-buffer 'always)
+(setq ido-file-extension-order '(".org" ".txt", ".el"))
 (ido-mode t)
-; idomenu allows ido to search iMenu results for a buffer
-;(autoload 'idomenu "idomenu" nil t)
-;(add-hook 'c-mode-common-hook 'imenu-add-menubar-index)
-;(global-set-key (kbd "M-i") 'idomenu)
 
 ;; Install fic (Fixme-in-comments) that will highlight TODO/FIXME/BUG
 (require 'fic-ext-mode)
@@ -67,79 +54,50 @@
 (setq org-plantuml-jar-path
       (expand-file-name "~/plantuml.jar"))
 
-;; Csharp-mode
-(autoload 'csharp-mode "csharp-mode" "Major mode for editing C# code." t)
-(setq auto-mode-alist
-      (append '(("\\.cs$" . csharp-mode)) auto-mode-alist))
-(defun my-csharp-mode-fn ()
-  "function that runs when csharp-mode is initialized for a buffer."
-  (turn-on-auto-revert-mode)
-  (setq indent-tabs-mode nil)
-  ;(setq tab-width 4)
-  ;(setq c-basic-offset 4)
-  (auto-complete-mode t)
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-etags)
-  (require 'flymake)
-  (flymake-mode 1)
-  ;(require 'yasnippet)
-  ;(yas/minor-mode-on)
-  ;(setq auto-completion-source 'etags)
-  ;(define-key csharp-mode-map (kbd "<f4>") 'complete-etags)
-  ;(define-key csharp-mode-map (kbd "C-<f4>") 'auto-completion-mode)
-;;  ;;(require 'rfringe)
-  )
-(add-hook  'csharp-mode-hook 'my-csharp-mode-fn)
-
-;;;;;;;;;;;;;;;;;;;;
-;; Sunrise commander
-;;;;;;;;;;;;;;;;;;;;
-
-;; Disable the commander style function keys. They are used for other purposes.
-;(setq sr-use-commander-keys nil)
-(require 'sunrise-commander)
-;(require 'sunrise-x-buttons) ; some extra help
-(add-to-list 'auto-mode-alist '("\\.srvm\\'" . sr-virtual-mode))
-; Open file with b in default application instead of in default browser
-(defun sr-browse-file (&optional file)
-  "Display the selected file with the default appication."
-  (interactive)
-  (setq file (or file (dired-get-filename)))
-  (save-selected-window
-    (sr-select-viewer-window)
-    (let ((buff (current-buffer))
-	  (fname (if (file-directory-p file)
-		     file
-		   (file-name-nondirectory file)))
-	  (app (cond
-		((eq system-type 'darwin)	"open %s")
-		((eq system-type 'windows-nt)	"open %s")
-		(t				"xdg-open %s"))))
-      (start-process-shell-command "open" nil (format app file))
-      (unless (eq buff (current-buffer))
-        (sr-scrollable-viewer (current-buffer)))
-      (message "Opening \"%s\" ..." fname))))
-
-
-; Call on surise commander from ido
-(defun ido-sunrise ()
-  "Call `sunrise' the ido way.
-    The directory is selected interactively by typing a substring.
-    For details on keybindings, see `ido-find-file'."
-  (interactive)
-  (let ((ido-report-no-match nil)
-        (ido-auto-merge-work-directories-length -1))
-    (ido-file-internal 'sr-dired 'sr-dired nil "Sunrise: " 'dir)))
-(define-key (cdr (assoc 'ido-mode minor-mode-map-alist)) [remap dired] 'ido-sunrise)
-
-; Active google style guides for C/C++
-;(require 'google-c-style)
-
-;(add-hook 'c-mode-common-hook 'google-set-c-style)
-;(add-hook 'c-mode-common-hook 'google-make-newline-indent)
-
 ;; open *help* in current frame
 (setq special-display-regexps (remove "[ ]?\\*[hH]elp.*" special-display-regexps))
+
+(defun gtags-root-dir ()
+  "Returns GTAGS root directory or nil if doesn't exist."
+  (with-temp-buffer
+    (if (zerop (call-process "global" nil t nil "-pr"))
+    (buffer-substring (point-min) (1- (point-max)))
+      nil)))
+(defun gtags-update-single(filename)  
+  "Update Gtags database for changes in a single file"
+  (interactive)
+  (start-process "update-gtags" "update-gtags" "bash" "-c" (concat "cd " (gtags-root-dir) " ; gtags --single-update " filename )))
+(defun gtags-update-current-file()
+  (interactive)
+  (defvar filename)
+  (setq filename (replace-regexp-in-string (gtags-root-dir) "." (buffer-file-name (current-buffer))))
+  (gtags-update-single filename)
+  (message "Gtags updated for %s" filename))
+(defun gtags-update-hook()
+  "Update GTAGS file incrementally upon saving a file"
+  (if (and (boundp 'gtags-mode) gtags-mode)
+      (when (gtags-root-dir)
+	(gtags-update-current-file))))
+(add-hook 'after-save-hook 'gtags-update-hook)
+
+
+(add-hook 'gtags-mode-hook 
+      (lambda()
+        (local-set-key (kbd "M-.") 'gtags-find-tag-from-here)
+        (local-set-key (kbd "M-,") 'gtags-find-rtag)
+        (local-set-key (kbd "C-M-,") 'gtags-find-symbol)
+        (local-set-key (kbd "M-ö") 'gtags-pop-stack)
+        ))
+
+(add-hook 'gtags-select-mode-hook 
+      (lambda()
+        (local-set-key (kbd "M-ö") 'gtags-pop-stack)
+        ))
+
+(add-hook 'c-mode-common-hook
+      (lambda ()
+        (require 'gtags)
+        (gtags-mode t)))
 
 
 ;;;;;;; auto complete
@@ -151,34 +109,6 @@
 (ac-config-default)
 (setq ac-stop-flymake-on-completing t)
 (require 'auto-complete-etags)
-
-;; (defun ac-clang-setup()
-;;   (when (gtags-root-dir)
-;;     (defvar filename)
-;;     (setq filename (concat (gtags-root-dir) "/ac-config.el"))
-;;     (when (file-exists-p filename)
-;;       (load filename)
-;;       (require 'auto-complete-clang)
-;;       (setq sp-include-dirs
-;; 	    (mapcar
-;; 	     (lambda(d) (concat "-I" (gtags-root-dir) "/" d))
-;; 	     sp-include-dirs
-;; 	     )
-;; 	    )
-;;       (setq ac-clang-flags
-;; 	    (append sp-compile-flags sp-include-dirs)
-;; 	    )
-
-;;       (add-to-list 'ac-omni-completion-sources
-;;       		   (cons "\\." '(ac-source-clang)))
-;;       (add-to-list 'ac-omni-completion-sources
-;;       		   (cons "->" '(ac-source-clang)))
-;;       (setq clang-completion-suppress-error t)
-;;       (setq ac-sources '(ac-source-clang))
-;;       )
-;;     )
-;;   )
-;; (add-hook 'c-mode-common-hook 'ac-clang-setup)
 
 ; Enable objective-C mode for .mm files automatically
 (add-to-list 'auto-mode-alist '("\\.mm$" . objc-mode))
@@ -194,7 +124,15 @@
 
 ; uniquify - use sensibel buffer names
 (require 'uniquify)
-;(uniquify-buffer-name-style (quote post-forward-angle-brackets) nil (uniquify)))
+(setq uniquify-buffer-name-style 'forward)
+
+; Enable common emacs extentions
+(require 'ibuffer)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(autoload 'ibuffer "ibuffer" "List buffer" t)
+(setq column-number-mode t)
+(show-paren-mode 1)
+
 
 ; multi eshell support
 (require 'multi-eshell)
@@ -207,7 +145,40 @@
 (setq ediff-split-window-function 'split-window-horizontally) ; split horiz
 ;(setq ediff-diff-options "-w") ; ignore white space
 ;(setq-default ediff-ignore-similar-regions t)
+;; Some custom configuration to ediff
+(defvar my-ediff-bwin-config nil "Window configuration before ediff.")
+(defcustom my-ediff-bwin-reg ?b
+  "*Register to be set up to hold `my-ediff-bwin-config'
+    configuration.")
 
+(defvar my-ediff-awin-config nil "Window configuration after ediff.")
+(defcustom my-ediff-awin-reg ?e
+  "*Register to be used to hold `my-ediff-awin-config' window
+    configuration.")
+
+(defun my-ediff-bsh ()
+  "Function to be called before any buffers or window setup for
+    ediff."
+  (setq my-ediff-bwin-config (current-window-configuration))
+  (when (characterp my-ediff-bwin-reg)
+    (set-register my-ediff-bwin-reg
+		  (list my-ediff-bwin-config (point-marker)))))
+
+(defun my-ediff-ash ()
+  "Function to be called after buffers and window setup for ediff."
+  (setq my-ediff-awin-config (current-window-configuration))
+  (when (characterp my-ediff-awin-reg)
+    (set-register my-ediff-awin-reg
+		  (list my-ediff-awin-config (point-marker)))))
+
+(defun my-ediff-qh ()
+  "Function to be called when ediff quits."
+  (when my-ediff-bwin-config
+    (set-window-configuration my-ediff-bwin-config)))
+
+(add-hook 'ediff-before-setup-hook 'my-ediff-bsh)
+(add-hook 'ediff-after-setup-windows-hook 'my-ediff-ash 'append)
+(add-hook 'ediff-quit-hook 'my-ediff-qh)
 
 ;;;;;;;;;;;;;;;;;;;
 
@@ -223,31 +194,14 @@
 	      auto-mode-alist))
 
 ; Magit - Emacs interface to git
-(require 'magit)
+;(require 'magit-popup)
 (require 'magit-blame)
-(require 'magit-svn)
-(autoload 'magit-status "magit" nil t)
-(autoload 'mo-git-blame-file "mo-git-blame" nil t)
-(autoload 'mo-git-blame-current "mo-git-blame" nil t)
-(setq mo-git-blame-use-ido t)
-(add-hook
- 'magit-mode-hook
- (lambda ()
-   (require 'rebase-mode)))
-(add-hook
- 'magit-mode-hook
- (lambda ()
-   (turn-on-magit-svn)))
-(eval-after-load 'rebase-mode
-  '(progn
-     (define-key rebase-mode-map (kbd "E") 'toggle-read-only)))
-(add-hook
- 'magit-log-edit-mode-hook
- (lambda ()
-   (set (make-local-variable 'whitespace-line-column) 70)
-   (whitespace-mode t)
-   )
- )
+;(require 'magit-svn)
+;(autoload 'magit-status "magit" nil t)
+(eval-after-load 'info
+  '(progn (info-initialize)
+          (add-to-list 'Info-directory-list "~/.emacs.d/magit/")))
+(require 'magit)
 
 ;; indent whole buffer. M-x iwb
 (defun iwb ()
@@ -271,14 +225,9 @@
 (windmove-default-keybindings 'meta)
 
 ;; Use left option key as meta, and right option key as ALT-GR
-;(setq mac-option-key-is-meta t)
-;(setq mac-right-option-modifier nil)
 (setq mac-option-modifier 'meta)
 (setq mac-right-option-modifier nil)
 (setq mac-command-modifier 'ctrl)
-
-;; Full screen toogle
-(global-set-key (kbd "C-S-F") 'ns-toggle-fullscreen)
 
 ;; Revert buffer, will disable to mapping to list directory that I don't
 ;; use
@@ -296,8 +245,6 @@
 (global-set-key (kbd "<f7>") 'recompile)
 ;(global-set-key (kbd "C-<f7>") 'compile)
 (global-set-key (kbd "C-<f8>") 'multi-eshell)
-(global-set-key (kbd "C-<f9>") 'sunrise-cd)
-(global-set-key (kbd "<f9>")   'sunrise)
 (global-set-key (kbd "C-<f2>") 'bm-toggle)
 (global-set-key (kbd "<f2>")   'bm-next)
 (global-set-key (kbd "<S-f2>") 'bm-previous)
@@ -464,30 +411,6 @@ ov)
 ;;;; Windows stuff
 ;;;;
 ;;
-(defvar my-fullscreen-p t "Check if fullscreen is on or off")
-
-(defun my-non-fullscreen ()
-  (interactive)
-  (if (fboundp 'w32-send-sys-command)
-	  ;; WM_SYSCOMMAND restore #xf120
-	  (w32-send-sys-command 61728)
-	(progn (set-frame-parameter nil 'width 82)
-		   (set-frame-parameter nil 'fullscreen 'fullheight))))
-
-(defun my-fullscreen ()
-  (interactive)
-  (if (fboundp 'w32-send-sys-command)
-	  ;; WM_SYSCOMMAND maximaze #xf030
-	  (w32-send-sys-command 61488)
-	(set-frame-parameter nil 'fullscreen 'fullboth)))
-
-(defun my-toggle-fullscreen ()
-  (interactive)
-  (setq my-fullscreen-p (not my-fullscreen-p))
-  (if my-fullscreen-p
-	  (my-non-fullscreen)
-	(my-fullscreen)))
-
 (let* ((bintools-root "C:/Program Files (x86)/Git")
        (bintools-bin (concat bintools-root "/bin")))
   (when (and (eq 'windows-nt system-type)
@@ -507,22 +430,59 @@ ov)
     ;; This removes unsightly ^M characters that would otherwise
     ;; appear in the output of java applications.
     (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)
-    (global-set-key (kbd "<f11>") 'my-toggle-fullscreen)
+    (global-set-key (kbd "<f11>") 'toggle-frame-fullscreen)
 ))
 
-(require 'google-this)
-(google-this-mode 1)
-(global-set-key (kbd "C-x g") 'google-this-mode-submap)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'org-install)
-(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-;(define-key global-map "\C-cl" 'org-store-link)
-;(define-key global-map "\C-ca" 'org-agenda)
+(add-to-list 'auto-mode-alist '("\\.\\(org\\|org_archive\\)$" . org-mode))
+(global-set-key "\C-cc" 'org-capture)
+;(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cb" 'org-iswitchb)
 (setq org-log-done t)
+(setq org-directory "~/SkyDrive @ Microsoft/org")
+(setq org-default-notes-file (concat org-directory "/refile.org"))
+(setq org-agenda-files (quote( "~/SkyDrive @ Microsoft/org" )))
+;; Capture templates
+(setq org-capture-templates
+      (quote (("t" "todo" entry (file "~/SkyDrive @ Microsoft/org/refile.org")
+               "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
+              ("n" "note" entry (file "~/SkyDrive @ Microsoft/org/refile.org")
+               "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
+              ("m" "Meeting" entry (file "~/SkyDrive @ Microsoft/org/refile.org")
+               "* MEETING with %? :MEETING:\n%U" :clock-in t :clock-resume t)
+              ("h" "Habit" entry (file "~/SkyDrive @ Microsoft/org/refile.org")
+               "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"<%Y-%m-%d %a .+1d/3d>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n"))))
 
+; Targets include this file and any file contributing to the agenda - up to 9 levels deep
+(setq org-refile-targets (quote ((nil :maxlevel . 9)
+                                 (org-agenda-files :maxlevel . 9))))
+; Use full outline paths for refile targets - we file directly with IDO
+(setq org-refile-use-outline-path t)
+; Targets complete directly with IDO
+(setq org-outline-path-complete-in-steps nil)
+; Allow refile to create parent tasks with confirmation
+(setq org-refile-allow-creating-parent-nodes (quote confirm))
+;;;; Refile settings
+; Exclude DONE state tasks from refile targets
+(defun bh/verify-refile-target ()
+  "Exclude todo keywords with a done state from refile targets"
+  (not (member (nth 2 (org-heading-components)) org-done-keywords)))
+(setq org-refile-target-verify-function 'bh/verify-refile-target)
+
+; Dos2unix
+(defun dos2unix ()
+  "Not exactly but it's easier to remember"
+  (interactive)
+  (set-buffer-file-coding-system 'unix 't) )
+(defun unix2dos ()
+  "Not exactly but it's easier to remember"
+  (interactive)
+  (set-buffer-file-coding-system 'utf-8-dos 't) )
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
