@@ -16,3 +16,6 @@
 [submodule "plantuml-mode"]
 	path = plantuml-mode
 	url = https://github.com/zwz/plantuml-mode.git
+[submodule "replace-plus"]
+	path = replace-plus
+	url = https://github.com/emacsmirror/replace-plus.git
