@@ -11,7 +11,6 @@
 (add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
 (add-to-list 'load-path "~/.emacs.d/magit")
 (add-to-list 'load-path "~/.emacs.d/git-modes")
-(add-to-list 'load-path "~/.emacs.d/replace-plus")
 (add-to-list 'load-path "~/.emacs.d/auto-complete-etags")
 (add-to-list 'load-path "~/.emacs.d/plantuml-mode")
 (add-to-list 'load-path "~/.emacs.d/ggtags")
@@ -422,15 +421,6 @@ ov)
     (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)
     (global-set-key (kbd "<f11>") 'toggle-frame-fullscreen)
 ))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Replace+
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(eval-after-load "replace" '(progn (require 'replace+)))
-(substitute-key-definition 'query-replace 'query-replace-w-options
-			   global-map)
-;(setq search/replace-region-as-default-flag t)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
