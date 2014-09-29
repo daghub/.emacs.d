@@ -16,9 +16,9 @@
 [submodule "plantuml-mode"]
 	path = plantuml-mode
 	url = https://github.com/zwz/plantuml-mode.git
-[submodule "replace-plus"]
-	path = replace-plus
-	url = https://github.com/emacsmirror/replace-plus.git
 [submodule "git-modes"]
 	path = git-modes
 	url = https://github.com/magit/git-modes.git
+[submodule "ggtags"]
+	path = ggtags
+	url = https://github.com/leoliu/ggtags.git

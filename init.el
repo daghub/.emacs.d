@@ -14,6 +14,7 @@
 (add-to-list 'load-path "~/.emacs.d/replace-plus")
 (add-to-list 'load-path "~/.emacs.d/auto-complete-etags")
 (add-to-list 'load-path "~/.emacs.d/plantuml-mode")
+(add-to-list 'load-path "~/.emacs.d/ggtags")
 
 ;; Treat .h files at c++ headers
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
@@ -58,48 +59,32 @@
 ;; open *help* in current frame
 (setq special-display-regexps (remove "[ ]?\\*[hH]elp.*" special-display-regexps))
 
-(defun gtags-root-dir ()
-  "Returns GTAGS root directory or nil if doesn't exist."
-  (with-temp-buffer
-    (if (zerop (call-process "global" nil t nil "-pr"))
-    (buffer-substring (point-min) (1- (point-max)))
-      nil)))
-(defun gtags-update-single(filename)  
-  "Update Gtags database for changes in a single file"
-  (interactive)
-  (start-process "update-gtags" "update-gtags" "bash" "-c" (concat "cd " (gtags-root-dir) " ; gtags --single-update " filename )))
-(defun gtags-update-current-file()
-  (interactive)
-  (defvar filename)
-  (setq filename (replace-regexp-in-string (gtags-root-dir) "." (buffer-file-name (current-buffer))))
-  (gtags-update-single filename)
-  (message "Gtags updated for %s" filename))
-(defun gtags-update-hook()
-  "Update GTAGS file incrementally upon saving a file"
-  (if (and (boundp 'gtags-mode) gtags-mode)
-      (when (gtags-root-dir)
-	(gtags-update-current-file))))
-(add-hook 'after-save-hook 'gtags-update-hook)
+(progn
+  (require 'ggtags)
+  ; I didn't find a mode hook for ggtags...
+  (define-key ggtags-navigation-map (kbd "M-ä") 'ggtags-navigation-next-file)
+  (define-key ggtags-navigation-map (kbd "M-ö") 'ggtags-navigation-previous-file)
+  (define-key ggtags-navigation-map (kbd "M-å") 'ggtags-find-reference)
+  (define-key ggtags-navigation-map (kbd "M-o") 'ff-find-other-file) ; overridden in ggtags
+  (define-key ggtags-mode-map (kbd "M-å") 'ggtags-find-reference)
+  (define-key ggtags-mode-map (kbd "C-C-f") 'ggtags-find-file)
+  (define-key ggtags-mode-map (kbd "M-f") 'forward-word) ; overriden in ggtags
+)
 
+;; Compilation mode (used by ggtags)
+(add-hook 'compilation-mode-hook
+          (lambda()
+            (local-set-key (kbd "M-ä") 'compilation-next-file)
+            (local-set-key (kbd "M-ö") 'compilation-previous-file)
+            ))
 
-(add-hook 'gtags-mode-hook 
-      (lambda()
-        (local-set-key (kbd "M-.") 'gtags-find-tag-from-here)
-        (local-set-key (kbd "M-,") 'gtags-find-rtag)
-        (local-set-key (kbd "C-M-,") 'gtags-find-symbol)
-        (local-set-key (kbd "M-ö") 'gtags-pop-stack)
-        ))
-
-(add-hook 'gtags-select-mode-hook 
-      (lambda()
-        (local-set-key (kbd "M-ö") 'gtags-pop-stack)
-        ))
 
 (add-hook 'c-mode-common-hook
-      (lambda ()
-        (require 'gtags)
-        (gtags-mode t)))
-
+          (lambda ()
+            (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+              (ggtags-mode 1)
+              (setq imenu-create-index-function 'ggtags-build-imenu-index)
+              )))
 
 ;;;;;;; auto complete
 ;(require 'completion-ui)
