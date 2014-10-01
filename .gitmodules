@@ -19,3 +19,6 @@
 [submodule "neotree"]
 	path = lisp/neotree
 	url = https://github.com/jaypei/emacs-neotree.git
+[submodule "lisp/undo-tree"]
+	path = lisp/undo-tree
+	url = http://www.dr-qubit.org/git/undo-tree.git/

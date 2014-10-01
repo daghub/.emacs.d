@@ -13,7 +13,8 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/auto-complete-etags")
 (add-to-list 'load-path "~/.emacs.d/lisp/plantuml-mode")
 (add-to-list 'load-path "~/.emacs.d/lisp/ggtags")
-(add-to-list 'load-path "~/.emacs.d/neotree")
+(add-to-list 'load-path "~/.emacs.d/lisp/neotree")
+(add-to-list 'load-path "~/.emacs.d/lisp/undo-tree")
 
 ;; Treat .h files at c++ headers
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
@@ -204,6 +205,7 @@
 ; Undo-tree
 (require 'undo-tree)
 (global-undo-tree-mode)
+(global-unset-key (kbd "C-z"))
 (global-set-key (kbd "C-z") 'undo-tree-undo)
 (global-set-key (kbd "C-S-z") 'undo-tree-redo)
 
