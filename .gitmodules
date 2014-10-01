@@ -1,9 +1,6 @@
 [submodule "magit"]
-	path = magit
+	path = lisp/magit
 	url = git@github.com:magit/magit.git
-[submodule "zenburn-emacs"]
-	path = zenburn-emacs
-	url = git@github.com:bbatsov/zenburn-emacs.git
 [submodule "emacs-google-this"]
 	path = emacs-google-this
 	url = git@github.com:Bruce-Connor/emacs-google-this.git
