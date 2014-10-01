@@ -14,7 +14,7 @@
 	path = lisp/git-modes
 	url = https://github.com/magit/git-modes.git
 [submodule "ggtags"]
-	path = ggtags
+	path = lisp/ggtags
 	url = https://github.com/leoliu/ggtags.git
 [submodule "neotree"]
 	path = neotree

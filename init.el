@@ -12,7 +12,7 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/git-modes")
 (add-to-list 'load-path "~/.emacs.d/lisp/auto-complete-etags")
 (add-to-list 'load-path "~/.emacs.d/lisp/plantuml-mode")
-(add-to-list 'load-path "~/.emacs.d/ggtags")
+(add-to-list 'load-path "~/.emacs.d/lisp/ggtags")
 (add-to-list 'load-path "~/.emacs.d/neotree")
 
 ;; Treat .h files at c++ headers
