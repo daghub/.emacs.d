@@ -10,7 +10,7 @@
 (add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
 (add-to-list 'load-path "~/.emacs.d/lisp/magit")
 (add-to-list 'load-path "~/.emacs.d/lisp/git-modes")
-(add-to-list 'load-path "~/.emacs.d/auto-complete-etags")
+(add-to-list 'load-path "~/.emacs.d/lisp/auto-complete-etags")
 (add-to-list 'load-path "~/.emacs.d/plantuml-mode")
 (add-to-list 'load-path "~/.emacs.d/ggtags")
 (add-to-list 'load-path "~/.emacs.d/neotree")
