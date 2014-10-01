@@ -22,3 +22,6 @@
 [submodule "lisp/undo-tree"]
 	path = lisp/undo-tree
 	url = http://www.dr-qubit.org/git/undo-tree.git/
+[submodule "lisp/bm"]
+	path = lisp/bm
+	url = https://github.com/joodland/bm.git

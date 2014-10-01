@@ -15,6 +15,7 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/ggtags")
 (add-to-list 'load-path "~/.emacs.d/lisp/neotree")
 (add-to-list 'load-path "~/.emacs.d/lisp/undo-tree")
+(add-to-list 'load-path "~/.emacs.d/lisp/bm")
 
 ;; Treat .h files at c++ headers
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
