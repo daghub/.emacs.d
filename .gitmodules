@@ -22,3 +22,6 @@
 [submodule "ggtags"]
 	path = ggtags
 	url = https://github.com/leoliu/ggtags.git
+[submodule "neotree"]
+	path = neotree
+	url = https://github.com/jaypei/emacs-neotree.git

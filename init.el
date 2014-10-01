@@ -14,6 +14,7 @@
 (add-to-list 'load-path "~/.emacs.d/auto-complete-etags")
 (add-to-list 'load-path "~/.emacs.d/plantuml-mode")
 (add-to-list 'load-path "~/.emacs.d/ggtags")
+(add-to-list 'load-path "~/.emacs.d/neotree")
 
 ;; Treat .h files at c++ headers
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
@@ -225,19 +226,23 @@
   (interactive) (revert-buffer t t))
 (global-set-key (kbd "C-x C-d") 'revert-buffer-no-confirm)
 
+; Neotree
+(require 'neotree)
+
 ;; Global function key mappings
 (global-set-key (kbd "C-<f6>") 'magit-status)
 (global-set-key (kbd "C-<f3>") 'flymake-mode)
 (global-set-key (kbd "S-<f3>") 'flymake-goto-prev-error)
-(global-set-key (kbd "<f3>") 'flymake-goto-next-error)
-(global-set-key (kbd "<f5>") 'gud-gdb)
-(global-set-key (kbd "<f7>") 'recompile)
-;(global-set-key (kbd "C-<f7>") 'compile)
+(global-set-key (kbd "<f3>")   'flymake-goto-next-error)
+(global-set-key (kbd "<f5>")   'gud-gdb)
+(global-set-key (kbd "<f7>")   'recompile)
 (global-set-key (kbd "C-<f8>") 'multi-eshell)
 (global-set-key (kbd "C-<f2>") 'bm-toggle)
 (global-set-key (kbd "<f2>")   'bm-next)
 (global-set-key (kbd "<S-f2>") 'bm-previous)
 (global-set-key (kbd "<f4>")   'auto-complete)
+(global-set-key (kbd "C-<f9>") 'neotree-find)
+(global-set-key (kbd "<f9>")   'neotree-toggle)
 
 ;; Use Ctrl-H as backspace
 ;(define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
