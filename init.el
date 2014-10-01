@@ -188,10 +188,7 @@
 	      auto-mode-alist))
 
 ; Magit - Emacs interface to git
-;(require 'magit-popup)
 (require 'magit-blame)
-;(require 'magit-svn)
-;(autoload 'magit-status "magit" nil t)
 (eval-after-load 'info
   '(progn (info-initialize)
           (add-to-list 'Info-directory-list "~/.emacs.d/magit/")))
@@ -232,9 +229,11 @@
 
 ; Neotree
 (require 'neotree)
+(setq neo-smart-open t)
 
 ;; Global function key mappings
 (global-set-key (kbd "C-<f6>") 'magit-status)
+(global-set-key (kbd "<f6>")   'magit-blame-mode)
 (global-set-key (kbd "C-<f3>") 'flymake-mode)
 (global-set-key (kbd "S-<f3>") 'flymake-goto-prev-error)
 (global-set-key (kbd "<f3>")   'flymake-goto-next-error)
@@ -245,7 +244,6 @@
 (global-set-key (kbd "<f2>")   'bm-next)
 (global-set-key (kbd "<S-f2>") 'bm-previous)
 (global-set-key (kbd "<f4>")   'auto-complete)
-(global-set-key (kbd "C-<f9>") 'neotree-find)
 (global-set-key (kbd "<f9>")   'neotree-toggle)
 
 ;; Use Ctrl-H as backspace
@@ -270,8 +268,8 @@ With argument, do this that many times."
   (interactive "p")
   (delete-word (- arg)))
 
-(defun kill-region-or-backward-kill-word (&optional arg region)
-  "`kill-region' if the region is active, otherwise `backward-kill-word'"
+(defun kill-region-or-backward-delete-word (&optional arg region)
+  "`kill-region' if the region is active, otherwise `backward-delete-word'"
   (interactive
    (list (prefix-numeric-value current-prefix-arg) (use-region-p)))
   (if region
@@ -279,7 +277,7 @@ With argument, do this that many times."
     (backward-delete-word arg)))
 (dolist (cmd '(delete-word backward-delete-word))
   (put cmd 'CUA 'move))
-(global-set-key (kbd "C-w") 'kill-region-or-backward-kill-word)
+(global-set-key (kbd "C-w") 'kill-region-or-backward-delete-word)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Delete a region if a key is pressed
@@ -291,13 +289,13 @@ With argument, do this that many times."
 (global-set-key (kbd "C-x m")   'execute-extended-command) ; In case I mis-type
 
 ;: Make sure i never miss a tab char again when editing C/C++
-;(defface extra-whitespace-face
-;  '((t (:background "pale green")))
-;  "Used for tabs and such.")
-;(defvar my-extra-keywords
-;  '(("\t" . 'extra-whitespace-face)))
-;(add-hook 'c-mode-common-hook
-;	  (lambda () (font-lock-add-keywords nil my-extra-keywords)))
+(defface extra-whitespace-face
+  '((t (:background "dark green")))
+  "Used for tabs and such.")
+(defvar my-extra-keywords
+  '(("\t" . 'extra-whitespace-face)))
+(add-hook 'c-mode-common-hook
+	  (lambda () (font-lock-add-keywords nil my-extra-keywords)))
 
 ;; Turn off sound beep
 (setq ring-bell-function 'ignore)
