@@ -17,5 +17,5 @@
 	path = lisp/ggtags
 	url = https://github.com/leoliu/ggtags.git
 [submodule "neotree"]
-	path = neotree
+	path = lisp/neotree
 	url = https://github.com/jaypei/emacs-neotree.git
