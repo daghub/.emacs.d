@@ -20,16 +20,20 @@
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
 ;; Color theme
-;(add-to-list 'custom-theme-load-path "~/.emacs.d/emacs-color-theme-solarized/")
 (load-theme 'deeper-blue t)
 
 ;; Disable scrollbars and toolbars
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
-;(menu-bar-mode -1)
 
-; Avoid emacs creating backup files
+;; Avoid emacs creating backup files
 (setq make-backup-files nil)
+
+;; Save auto-save files in temp directory
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
 
 ;;;;;;;;;;;;;;;;;;;
 ;ido
