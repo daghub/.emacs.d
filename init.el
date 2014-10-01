@@ -7,10 +7,9 @@
 
 ; Add load directory
 (add-to-list 'load-path "~/.emacs.d/")
-(add-to-list 'load-path "~/.emacs.d/apel-10.8")
 (add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
 (add-to-list 'load-path "~/.emacs.d/lisp/magit")
-(add-to-list 'load-path "~/.emacs.d/git-modes")
+(add-to-list 'load-path "~/.emacs.d/lisp/git-modes")
 (add-to-list 'load-path "~/.emacs.d/auto-complete-etags")
 (add-to-list 'load-path "~/.emacs.d/plantuml-mode")
 (add-to-list 'load-path "~/.emacs.d/ggtags")

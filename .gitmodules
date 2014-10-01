@@ -11,7 +11,7 @@
 	path = plantuml-mode
 	url = https://github.com/zwz/plantuml-mode.git
 [submodule "git-modes"]
-	path = git-modes
+	path = lisp/git-modes
 	url = https://github.com/magit/git-modes.git
 [submodule "ggtags"]
 	path = ggtags
