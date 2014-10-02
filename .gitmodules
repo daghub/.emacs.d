@@ -25,3 +25,6 @@
 [submodule "lisp/bm"]
 	path = lisp/bm
 	url = https://github.com/joodland/bm.git
+[submodule "lisp/iedit"]
+	path = lisp/iedit
+	url = https://github.com/victorhge/iedit.git

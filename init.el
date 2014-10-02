@@ -6,7 +6,6 @@
 (setq inhibit-startup-message t)
 
 ; Add load directory
-(add-to-list 'load-path "~/.emacs.d/lisp")
 (add-to-list 'load-path "~/.emacs.d/lisp/auto-complete-1.3.1")
 (add-to-list 'load-path "~/.emacs.d/lisp/magit")
 (add-to-list 'load-path "~/.emacs.d/lisp/git-modes")
@@ -16,6 +15,8 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/neotree")
 (add-to-list 'load-path "~/.emacs.d/lisp/undo-tree")
 (add-to-list 'load-path "~/.emacs.d/lisp/bm")
+(add-to-list 'load-path "~/.emacs.d/lisp/iedit")
+(add-to-list 'load-path "~/.emacs.d/lisp")
 
 ;; Treat .h files at c++ headers
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
@@ -387,23 +388,23 @@ ov)
 ;; Enable isearch-like editing
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'iedit)
-(defun iedit-dwim (arg)
-  "Starts iedit but uses \\[narrow-to-defun] to limit its scope."
-  (interactive "P")
-  (if arg
-      (iedit-mode)
-    (save-excursion
-      (save-restriction
-        (widen)
-        ;; this function determines the scope of `iedit-start'.
-        (narrow-to-defun)
-        (if iedit-mode
-            (iedit-done)
-          ;; `current-word' can of course be replaced by other
-          ;; functions.
-          (iedit-start (current-word)))))))
+;; (defun iedit-dwim (arg)
+;;   "Starts iedit but uses \\[narrow-to-defun] to limit its scope."
+;;   (interactive "P")
+;;   (if arg
+;;       (iedit-mode)
+;;     (save-excursion
+;;       (save-restriction
+;;         (widen)
+;;         ;; this function determines the scope of `iedit-start'.
+;;         (narrow-to-defun)
+;;         (if iedit-mode
+;;             (iedit-done)
+;;           ;; `current-word' can of course be replaced by other
+;;           ;; functions.
+;;           (iedit-start (current-word)))))))
 
-(global-set-key (kbd "C-;") 'iedit-mode)
+;; (global-set-key (kbd "C-;") 'iedit-mode)
 
 ;;;;
 ;;;; Windows stuff
