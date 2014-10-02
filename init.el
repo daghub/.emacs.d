@@ -6,8 +6,8 @@
 (setq inhibit-startup-message t)
 
 ; Add load directory
-(add-to-list 'load-path "~/.emacs.d/")
-(add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
+(add-to-list 'load-path "~/.emacs.d/lisp")
+(add-to-list 'load-path "~/.emacs.d/lisp/auto-complete-1.3.1")
 (add-to-list 'load-path "~/.emacs.d/lisp/magit")
 (add-to-list 'load-path "~/.emacs.d/lisp/git-modes")
 (add-to-list 'load-path "~/.emacs.d/lisp/auto-complete-etags")
