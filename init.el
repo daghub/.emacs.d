@@ -6,7 +6,8 @@
 (setq inhibit-startup-message t)
 
 ; Add load directory
-(add-to-list 'load-path "~/.emacs.d/lisp/auto-complete-1.3.1")
+(add-to-list 'load-path "~/.emacs.d/lisp/popup")
+(add-to-list 'load-path "~/.emacs.d/lisp/auto-complete")
 (add-to-list 'load-path "~/.emacs.d/lisp/magit")
 (add-to-list 'load-path "~/.emacs.d/lisp/git-modes")
 (add-to-list 'load-path "~/.emacs.d/lisp/plantuml-mode")
@@ -106,8 +107,6 @@
 (setq ac-auto-start nil)
 (ac-set-trigger-key "TAB")
 
-; Enable objective-C mode for .mm files automatically
-(add-to-list 'auto-mode-alist '("\\.mm$" . objc-mode))
 
 ; Enable jumping between cpp and header file using keyboard shortcut
 (global-set-key (kbd "M-o") 'ff-find-other-file)
@@ -220,16 +219,19 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CMake
+;; Modes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; CMake major mode
+;; CMake major mode
 (setq load-path (cons (expand-file-name "~/emacs/cmake-mode.el") load-path))
 (require 'cmake-mode)
 (setq auto-mode-alist
       (append '(("CMakeLists\\.txt\\'" . cmake-mode)
 		("\\.cmake\\'" . cmake-mode))
 	      auto-mode-alist))
+
+;; Enable objective-C mode for .mm files automatically
+(add-to-list 'auto-mode-alist '("\\.mm$" . objc-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Magit
@@ -242,25 +244,24 @@
           (add-to-list 'Info-directory-list "~/.emacs.d/magit/")))
 (require 'magit)
 
-
-; Undo-tree
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Undo-tree
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'undo-tree)
 (global-undo-tree-mode)
 (global-unset-key (kbd "C-z"))
 (global-set-key (kbd "C-z") 'undo-tree-undo)
 (global-set-key (kbd "C-S-z") 'undo-tree-redo)
 
-; Visual bookmarks
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Visual bookmarks
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'bm)
 
 ; Switch between windows using cursors keys
 (require 'windmove)
 (windmove-default-keybindings 'meta)
 
-;; Use left option key as meta, and right option key as ALT-GR
-(setq mac-option-modifier 'meta)
-(setq mac-right-option-modifier nil)
-(setq mac-command-modifier 'ctrl)
 
 ;; Revert buffer, will disable to mapping to list directory that I don't
 ;; use
@@ -356,9 +357,11 @@ With argument, do this that many times."
 ; try to improve slow performance on windows.
 (setq w32-get-true-file-attributes nil)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; flymake
-; Show flymake errors in minibuffer
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Show flymake errors in minibuffer
 (eval-after-load 'flymake '(require 'flymake-cursor))
 
 (add-hook 'c-mode-common-hook
@@ -380,9 +383,11 @@ With argument, do this that many times."
 ; Avoid the error message box where flymake is not possible
 (setq flymake-gui-warnings-enabled nil)
 
-;;-------------
-;;Add color to the current GUD line (obrigado google)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; GUD/GDB
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Add color to the current GUD line (obrigado google)
 (defvar gud-overlay
 (let* ((ov (make-overlay (point-min) (point-min))))
 (overlay-put ov 'face 'secondary-selection)
@@ -403,11 +408,13 @@ ov)
 (delete-overlay gud-overlay)))
 
 (add-hook 'kill-buffer-hook 'gud-kill-buffer)
-;;-------------------------------------------------------------
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Compilation window. Hides the window after a second if successful
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Compilation window
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Hides the window after a second if successful
 (defun kill-compile-buffer-if-successful (buffer string)
   " kill a compilation buffer if succeeded without warnings "
   (if (and
@@ -420,35 +427,27 @@ ov)
                       'kill-buffer
                       buffer)))
 (add-hook 'compilation-finish-functions 'kill-compile-buffer-if-successful)
-; Automatically scroll the output to the first error
+
+;; Automatically scroll the output to the first error
 (setq compilation-scroll-output 'first-error)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Enable isearch-like editing
+;; iEdit
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'iedit)
-;; (defun iedit-dwim (arg)
-;;   "Starts iedit but uses \\[narrow-to-defun] to limit its scope."
-;;   (interactive "P")
-;;   (if arg
-;;       (iedit-mode)
-;;     (save-excursion
-;;       (save-restriction
-;;         (widen)
-;;         ;; this function determines the scope of `iedit-start'.
-;;         (narrow-to-defun)
-;;         (if iedit-mode
-;;             (iedit-done)
-;;           ;; `current-word' can of course be replaced by other
-;;           ;; functions.
-;;           (iedit-start (current-word)))))))
 
-;; (global-set-key (kbd "C-;") 'iedit-mode)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; OS X stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;
-;;;; Windows stuff
-;;;;
-;;
+;; Use left option key as meta, and right option key as ALT-GR
+(setq mac-option-modifier 'meta)
+(setq mac-right-option-modifier nil)
+(setq mac-command-modifier 'ctrl)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Windows stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (let* ((bintools-root "C:/Program Files (x86)/Git")
        (bintools-bin (concat bintools-root "/bin")))
   (when (and (eq 'windows-nt system-type)

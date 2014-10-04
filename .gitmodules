@@ -28,3 +28,9 @@
 [submodule "lisp/dtrt-indent"]
 	path = lisp/dtrt-indent
 	url = https://github.com/jscheid/dtrt-indent.git
+[submodule "lisp/auto-complete"]
+	path = lisp/auto-complete
+	url = https://github.com/auto-complete/auto-complete.git
+[submodule "lisp/popup"]
+	path = lisp/popup
+	url = https://github.com/auto-complete/popup-el.git
