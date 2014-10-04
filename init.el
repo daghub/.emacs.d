@@ -9,13 +9,13 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/auto-complete-1.3.1")
 (add-to-list 'load-path "~/.emacs.d/lisp/magit")
 (add-to-list 'load-path "~/.emacs.d/lisp/git-modes")
-(add-to-list 'load-path "~/.emacs.d/lisp/auto-complete-etags")
 (add-to-list 'load-path "~/.emacs.d/lisp/plantuml-mode")
 (add-to-list 'load-path "~/.emacs.d/lisp/ggtags")
 (add-to-list 'load-path "~/.emacs.d/lisp/neotree")
 (add-to-list 'load-path "~/.emacs.d/lisp/undo-tree")
 (add-to-list 'load-path "~/.emacs.d/lisp/bm")
 (add-to-list 'load-path "~/.emacs.d/lisp/iedit")
+(add-to-list 'load-path "~/.emacs.d/lisp/dtrt-indent")
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
 ;; Treat .h files at c++ headers
@@ -23,6 +23,9 @@
 
 ;; Color theme
 (load-theme 'deeper-blue t)
+
+;; Allow narrowing
+(put 'narrow-to-region 'disabled nil)
 
 ;; Disable scrollbars and toolbars
 (scroll-bar-mode -1)
@@ -37,8 +40,9 @@
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
 
-;;;;;;;;;;;;;;;;;;;
-;ido
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ido
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'ido)
 (setq ido-enable-flex-matching t)
 (setq ido-everywhere t)
@@ -92,15 +96,15 @@
               (setq imenu-create-index-function 'ggtags-build-imenu-index)
               )))
 
-;;;;;;; auto complete
-;(require 'completion-ui)
-;(autoload 'auto-completion-mode "auto-completion-mode" "a" t)
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; auto complete
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'auto-complete)
 (require 'auto-complete-config)
 (ac-config-default)
 (setq ac-stop-flymake-on-completing t)
-(require 'auto-complete-etags)
+(setq ac-auto-start nil)
+(ac-set-trigger-key "TAB")
 
 ; Enable objective-C mode for .mm files automatically
 (add-to-list 'auto-mode-alist '("\\.mm$" . objc-mode))
@@ -111,37 +115,74 @@
 (setq cc-search-directories
       '("." ".." "../.."))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; coding style and offset, indent
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; Make sure we indent C/C++ with 4 spaces
 (setq c-default-style "linux"
       c-basic-offset 4)
 (setq-default indent-tabs-mode nil)
-; Enable copying between dired windows
+
+;; indent whole buffer. M-x iwb
+(defun iwb ()
+  "indent whole buffer"
+  (interactive)
+  (delete-trailing-whitespace)
+  (indent-region (point-min) (point-max) nil)
+  (untabify (point-min) (point-max)))
+
+;; Show trailing white space
+;; (setq-default show-trailing-whitespace t)
+
+; Adapt to foreign indentation offets
+(require 'dtrt-indent)
+(dtrt-indent-mode 1)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; dired stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Enable copying between dired windows
 (setq dired-dwim-target t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; buffer stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; uniquify - use sensibel buffer names
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 
-; Enable common emacs extentions
 (require 'ibuffer)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (autoload 'ibuffer "ibuffer" "List buffer" t)
 (setq column-number-mode t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Highlight parenthesis
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (show-paren-mode 1)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; eshell
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; multi eshell support
 (require 'multi-eshell)
 ; make eshell tab completion behave like bash
 (setq eshell-cmpl-cycle-completions nil)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ediff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; ediff settings
 (setq ediff-window-setup-function 'ediff-setup-windows-plain) ; integrate control panel in active frame
 (setq ediff-split-window-function 'split-window-horizontally) ; split horiz
-;(setq ediff-diff-options "-w") ; ignore white space
-;(setq-default ediff-ignore-similar-regions t)
-;; Some custom configuration to ediff
+
+;; Save window configuration that was in use prior to ediff
 (defvar my-ediff-bwin-config nil "Window configuration before ediff.")
 (defcustom my-ediff-bwin-reg ?b
   "*Register to be set up to hold `my-ediff-bwin-config'
@@ -176,10 +217,11 @@
 (add-hook 'ediff-after-setup-windows-hook 'my-ediff-ash 'append)
 (add-hook 'ediff-quit-hook 'my-ediff-qh)
 
-;;;;;;;;;;;;;;;;;;;
 
-; Show trailing white space
-;(setq-default show-trailing-whitespace t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CMake
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; CMake major mode
 (setq load-path (cons (expand-file-name "~/emacs/cmake-mode.el") load-path))
@@ -189,6 +231,10 @@
 		("\\.cmake\\'" . cmake-mode))
 	      auto-mode-alist))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Magit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; Magit - Emacs interface to git
 (require 'magit-blame)
 (eval-after-load 'info
@@ -196,13 +242,6 @@
           (add-to-list 'Info-directory-list "~/.emacs.d/magit/")))
 (require 'magit)
 
-;; indent whole buffer. M-x iwb
-(defun iwb ()
-  "indent whole buffer"
-  (interactive)
-  (delete-trailing-whitespace)
-  (indent-region (point-min) (point-max) nil)
-  (untabify (point-min) (point-max)))
 
 ; Undo-tree
 (require 'undo-tree)

@@ -28,3 +28,6 @@
 [submodule "lisp/iedit"]
 	path = lisp/iedit
 	url = https://github.com/victorhge/iedit.git
+[submodule "lisp/dtrt-indent"]
+	path = lisp/dtrt-indent
+	url = https://github.com/jscheid/dtrt-indent.git
