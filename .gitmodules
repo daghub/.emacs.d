@@ -4,9 +4,6 @@
 [submodule "predictive"]
 	path = predictive
 	url = http://www.dr-qubit.org/git/predictive.git
-[submodule "auto-complete-etags"]
-	path = lisp/auto-complete-etags
-	url = git@github.com:whitypig/auto-complete-etags.git
 [submodule "plantuml-mode"]
 	path = lisp/plantuml-mode
 	url = https://github.com/zwz/plantuml-mode.git
