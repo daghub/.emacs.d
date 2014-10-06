@@ -70,6 +70,9 @@
 ;; open *help* in current frame
 (setq special-display-regexps (remove "[ ]?\\*[hH]elp.*" special-display-regexps))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ggtags
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (progn
   (require 'ggtags)
   ; I didn't find a mode hook for ggtags...
@@ -80,7 +83,10 @@
   (define-key ggtags-mode-map (kbd "M-å") 'ggtags-find-reference)
   (define-key ggtags-mode-map (kbd "C-C-f") 'ggtags-find-file)
   (define-key ggtags-mode-map (kbd "M-f") 'forward-word) ; overriden in ggtags
-)
+  )
+
+(setq ggtags-highlight-tag-delay 1.0)
+
 
 ;; Compilation mode (used by ggtags)
 (add-hook 'compilation-mode-hook
@@ -93,8 +99,10 @@
 (add-hook 'c-mode-common-hook
           (lambda ()
             (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+              (setq-local eldoc-documentation-function #'ggtags-eldoc-function)
+              (setq-local imenu-create-index-function #'ggtags-build-imenu-index)
+              (eldoc-mode 1)
               (ggtags-mode 1)
-              (setq imenu-create-index-function 'ggtags-build-imenu-index)
               )))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -521,9 +529,3 @@ ov)
   (interactive)
   (set-buffer-file-coding-system 'utf-8-dos 't) )
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes (quote ("1e7e097ec8cb1f8c3a912d7e1e0331caeed49fef6cff220be63bd2a6ba4cc365" "fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" "a81fbcd4c2903eca49c448680055afc1a0e534bf454f2d83edbfc5e4259aa789" default))))
