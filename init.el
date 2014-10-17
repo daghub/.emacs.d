@@ -86,7 +86,8 @@
   )
 
 (setq ggtags-highlight-tag-delay 1.0)
-
+(setq ggtags-global-abbreviate-filename nil)
+(setq ggtags-split-window-function #'split-window-vertically)
 
 ;; Compilation mode (used by ggtags)
 (add-hook 'compilation-mode-hook
