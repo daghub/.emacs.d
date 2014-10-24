@@ -1,6 +1,10 @@
 ; Emacs config file
 (server-start) ;; allow emacs-client to connect
 
+;; Disable scrollbars and toolbars
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+
 ;; Hide splash-screen and startup-message
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
@@ -8,6 +12,7 @@
 ; Add load directory
 (add-to-list 'load-path "~/.emacs.d/lisp/popup")
 (add-to-list 'load-path "~/.emacs.d/lisp/auto-complete")
+(add-to-list 'load-path "~/.emacs.d/lisp/company-mode")
 (add-to-list 'load-path "~/.emacs.d/lisp/magit")
 (add-to-list 'load-path "~/.emacs.d/lisp/git-modes")
 (add-to-list 'load-path "~/.emacs.d/lisp/plantuml-mode")
@@ -19,18 +24,17 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/dtrt-indent")
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
-;; Treat .h files at c++ headers
-(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-
 ;; Color theme
 (load-theme 'deeper-blue t)
 
+; (Re)compile any lisp changes
+;(byte-recompile-directory (expand-file-name "~/.emacs.d") 0)
+
+;; Treat .h files at c++ headers
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+
 ;; Allow narrowing
 (put 'narrow-to-region 'disabled nil)
-
-;; Disable scrollbars and toolbars
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
 
 ;; Avoid emacs creating backup files
 (setq make-backup-files nil)
@@ -87,7 +91,7 @@
 
 (setq ggtags-highlight-tag-delay 1.0)
 (setq ggtags-global-abbreviate-filename nil)
-(setq ggtags-split-window-function #'split-window-vertically)
+;(setq ggtags-split-window-function #'split-window-vertically)
 
 ;; Compilation mode (used by ggtags)
 (add-hook 'compilation-mode-hook
@@ -109,19 +113,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; auto complete
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'auto-complete)
-(require 'auto-complete-config)
-(ac-config-default)
-(setq ac-stop-flymake-on-completing t)
-(setq ac-auto-start nil)
-(ac-set-trigger-key "TAB")
-
+;; (require 'auto-complete)
+;; (require 'auto-complete-config)
+;; (ac-config-default)
+;; (setq ac-stop-flymake-on-completing t)
+;; (setq ac-auto-start nil)
+;; (ac-set-trigger-key "TAB")
+(require 'company)
+;(global-set-key "\t" 'company-complete)
+(setq company-idle-delay 10)
+(add-hook 'after-init-hook 'global-company-mode)
 
 ; Enable jumping between cpp and header file using keyboard shortcut
 (global-set-key (kbd "M-o") 'ff-find-other-file)
 ; Make sure we can find headers where we want them
 (setq cc-search-directories
-      '("." ".." "../.."))
+      '("." ".." "../.." "../inc" "../src" "../api"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; coding style and offset, indent
@@ -252,6 +259,7 @@
   '(progn (info-initialize)
           (add-to-list 'Info-directory-list "~/.emacs.d/magit/")))
 (require 'magit)
+(magit-auto-revert-mode -1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Undo-tree
@@ -286,16 +294,13 @@
 ;; Global function key mappings
 (global-set-key (kbd "C-<f6>") 'magit-status)
 (global-set-key (kbd "<f6>")   'magit-blame-mode)
-(global-set-key (kbd "C-<f3>") 'flymake-mode)
-(global-set-key (kbd "S-<f3>") 'flymake-goto-prev-error)
-(global-set-key (kbd "<f3>")   'flymake-goto-next-error)
 (global-set-key (kbd "<f5>")   'gud-gdb)
 (global-set-key (kbd "<f7>")   'recompile)
 (global-set-key (kbd "C-<f8>") 'multi-eshell)
 (global-set-key (kbd "C-<f2>") 'bm-toggle)
 (global-set-key (kbd "<f2>")   'bm-next)
 (global-set-key (kbd "<S-f2>") 'bm-previous)
-(global-set-key (kbd "<f4>")   'auto-complete)
+(global-set-key (kbd "<f4>")   'company-complete)
 (global-set-key (kbd "<f9>")   'neotree-toggle)
 
 ;; Use Ctrl-H as backspace
@@ -305,6 +310,10 @@
 ;; Use Ctrl-Ã Ã¤s beginning of buffer
 (define-key key-translation-map (kbd "C-ö") 'beginning-of-buffer)
 (define-key key-translation-map (kbd "C-ä") 'end-of-buffer)
+(define-key key-translation-map (kbd "M-ö") 'backward-paragraph)
+(define-key key-translation-map (kbd "M-ä") 'forward-paragraph)
+
+(global-set-key (kbd "C-.") 'pop-tag-mark)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Make Ctrl-W function as backward-delete-word if region is not active
@@ -365,32 +374,6 @@ With argument, do this that many times."
 
 ; try to improve slow performance on windows.
 (setq w32-get-true-file-attributes nil)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; flymake
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Show flymake errors in minibuffer
-(eval-after-load 'flymake '(require 'flymake-cursor))
-
-(add-hook 'c-mode-common-hook
-	  (function (lambda()
-		      (flymake-mode t)
-		      )
-		    )
-	  )
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(flymake-errline ((((class color)) (:underline "orange"))))
- '(flymake-warnline ((((class color)) (:underline "yellow")))))
-
-
-; Avoid the error message box where flymake is not possible
-(setq flymake-gui-warnings-enabled nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; GUD/GDB
