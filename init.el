@@ -11,7 +11,7 @@
 
 ; Add load directory
 (add-to-list 'load-path "~/.emacs.d/lisp/popup")
-(add-to-list 'load-path "~/.emacs.d/lisp/auto-complete")
+;;(add-to-list 'load-path "~/.emacs.d/lisp/auto-complete")
 (add-to-list 'load-path "~/.emacs.d/lisp/company-mode")
 (add-to-list 'load-path "~/.emacs.d/lisp/magit")
 (add-to-list 'load-path "~/.emacs.d/lisp/git-modes")
@@ -129,6 +129,7 @@
 ; Make sure we can find headers where we want them
 (setq cc-search-directories
       '("." ".." "../.." "../inc" "../src" "../api"))
+(global-set-key "\M- " 'hippie-expand)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; coding style and offset, indent
@@ -314,6 +315,11 @@
 (define-key key-translation-map (kbd "M-ä") 'forward-paragraph)
 
 (global-set-key (kbd "C-.") 'pop-tag-mark)
+
+
+
+(global-set-key (kbd "<next>")    'other-window)
+(global-set-key (kbd "<prior>")   'switch-to-buffer)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Make Ctrl-W function as backward-delete-word if region is not active
