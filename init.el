@@ -338,11 +338,9 @@
 ;(define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (define-key key-translation-map [?\C-h] [?\C-?])
 
-;; Use Ctrl-Ã Ã¤s beginning of buffer
-(define-key key-translation-map (kbd "C-ö") 'beginning-of-buffer)
-(define-key key-translation-map (kbd "C-ä") 'end-of-buffer)
-(define-key key-translation-map (kbd "M-ö") 'backward-paragraph)
-(define-key key-translation-map (kbd "M-ä") 'forward-paragraph)
+;; Use home and end keys to go to beginning and end of buffer
+(global-set-key (kbd "<home>") 'beginning-of-buffer)
+(global-set-key (kbd "<end>") 'end-of-buffer)
 
 (global-set-key (kbd "C-.") 'pop-tag-mark)
 
