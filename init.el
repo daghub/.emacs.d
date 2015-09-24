@@ -61,11 +61,18 @@
 (add-hook 'god-mode-disabled-hook 'my-update-cursor)
 (define-key god-local-mode-map (kbd ".") 'repeat)
 (define-key god-local-mode-map (kbd "i") 'god-local-mode)
-(global-set-key (kbd "C-x C-1") 'delete-other-windows)
-(global-set-key (kbd "C-x C-2") 'split-window-below)
-(global-set-key (kbd "C-x C-3") 'split-window-right)
-(global-set-key (kbd "C-x C-0") 'delete-window)
+
+; added to better support programmer dvorak
+(global-set-key (kbd "C-x C-(") 'delete-other-windows)
+(global-set-key (kbd "C-x C-)") 'split-window-below)
+(global-set-key (kbd "C-x C-}") 'split-window-right)
+(global-set-key (kbd "C-x C-*") 'delete-window)
 (global-set-key (kbd "C-x C-o") 'other-window)
+(global-set-key (kbd "C-x (") 'delete-other-windows)
+(global-set-key (kbd "C-x )") 'split-window-below)
+(global-set-key (kbd "C-x }") 'split-window-right)
+(global-set-key (kbd "C-x *") 'delete-window)
+(global-set-key (kbd "C-x o") 'other-window)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
