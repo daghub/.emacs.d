@@ -63,6 +63,7 @@
 
 (add-hook 'god-mode-enabled-hook 'my-update-cursor)
 (add-hook 'god-mode-disabled-hook 'my-update-cursor)
+
 (define-key god-local-mode-map (kbd ".") 'repeat)
 (define-key god-local-mode-map (kbd "i") 'god-local-mode)
 
@@ -78,6 +79,18 @@
 (global-set-key (kbd "C-x *") 'delete-window)
 (global-set-key (kbd "C-x o") 'other-window)
 
+; change mode line oolour
+(defun god-mode-update-colour ()
+  (let ((limited-colors-p (> 257 (length (defined-colors)))))
+    (cond (god-local-mode (progn
+                            (set-face-background 'mode-line (if limited-colors-p "white" "#cc4444"))
+                            (set-face-background 'mode-line-inactive (if limited-colors-p "white" "#606060"))))
+          (t (progn
+               (set-face-background 'mode-line (if limited-colors-p "black" "white"))
+               (set-face-background 'mode-line-inactive (if limited-colors-p "black" "#606060")))))))
+
+(add-hook 'god-mode-enabled-hook 'god-mode-update-colour)
+(add-hook 'god-mode-disabled-hook 'god-mode-update-colour)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ido
