@@ -23,6 +23,10 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/iedit")
 (add-to-list 'load-path "~/.emacs.d/lisp/dtrt-indent")
 (add-to-list 'load-path "~/.emacs.d/god-mode")
+(add-to-list 'load-path "~/.emacs.d/lisp/elpy")
+(add-to-list 'load-path "~/.emacs.d/lisp/pyvenv")
+(add-to-list 'load-path "~/.emacs.d/lisp/highlight-indentation")
+(add-to-list 'load-path "~/.emacs.d/lisp/yasnippet")
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
 ;; Color theme
@@ -495,6 +499,10 @@ ov)
     (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)
     (global-set-key (kbd "<f11>") 'toggle-frame-fullscreen)
 ))
+
+; elpy
+(require 'elpy)
+(elpy-enable)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

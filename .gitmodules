@@ -40,3 +40,16 @@
 [submodule "god-mode"]
 	path = god-mode
 	url = https://github.com/chrisdone/god-mode.git
+
+[submodule "lisp/elpy"]
+	path = lisp/elpy
+	url = https://github.com/jorgenschaefer/elpy.git
+[submodule "lisp/pyvenv"]
+	path = lisp/pyvenv
+	url = https://github.com/jorgenschaefer/pyvenv.git
+[submodule "lisp/highlight-indentation"]
+	path = lisp/highlight-indentation
+	url = https://github.com/antonj/Highlight-Indentation-for-Emacs/
+[submodule "lisp/yasnippet"]
+	path = lisp/yasnippet
+	url = https://github.com/capitaomorte/yasnippet
