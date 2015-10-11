@@ -114,11 +114,11 @@
 (progn
   (require 'ggtags)
   ; I didn't find a mode hook for ggtags...
-  (define-key ggtags-navigation-map (kbd "M-ä") 'ggtags-navigation-next-file)
-  (define-key ggtags-navigation-map (kbd "M-ö") 'ggtags-navigation-previous-file)
-  (define-key ggtags-navigation-map (kbd "M-å") 'ggtags-find-reference)
-  (define-key ggtags-navigation-map (kbd "M-o") 'ff-find-other-file) ; overridden in ggtags
-  (define-key ggtags-mode-map (kbd "M-å") 'ggtags-find-reference)
+  ;(define-key ggtags-navigation-map (kbd "M-ä") 'ggtags-navigation-next-file)
+  ;(define-key ggtags-navigation-map (kbd "M-ö") 'ggtags-navigation-previous-file)
+  ;(define-key ggtags-navigation-map (kbd "M-å") 'ggtags-find-reference)
+  ;(define-key ggtags-navigation-map (kbd "M-o") 'ff-find-other-file) ; overridden in ggtags
+  ;(define-key ggtags-mode-map (kbd "M-å") 'ggtags-find-reference)
   (define-key ggtags-mode-map (kbd "C-C-f") 'ggtags-find-file)
   (define-key ggtags-mode-map (kbd "M-f") 'forward-word) ; overriden in ggtags
   )
@@ -128,11 +128,11 @@
 ;(setq ggtags-split-window-function #'split-window-vertically)
 
 ;; Compilation mode (used by ggtags)
-(add-hook 'compilation-mode-hook
-          (lambda()
-            (local-set-key (kbd "M-ä") 'compilation-next-file)
-            (local-set-key (kbd "M-ö") 'compilation-previous-file)
-            ))
+;(add-hook 'compilation-mode-hook
+;          (lambda()
+;            (local-set-key (kbd "M-ä") 'compilation-next-file)
+;            (local-set-key (kbd "M-ö") 'compilation-previous-file)
+;            ))
 
 
 (add-hook 'c-mode-common-hook
@@ -340,7 +340,7 @@
 
 ;; Use Ctrl-H as backspace
 ;(define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
-(define-key key-translation-map [?\C-h] [?\C-?])
+(global-set-key (kbd "C-h") 'delete-backward-char)
 
 ;; Use home and end keys to go to beginning and end of buffer
 (global-set-key (kbd "<home>") 'beginning-of-buffer)
@@ -350,8 +350,8 @@
 
 
 
-(global-set-key (kbd "<next>")    'other-window)
-(global-set-key (kbd "<prior>")   'switch-to-buffer)
+;;(global-set-key (kbd "<next>")    'other-window)
+;;(global-set-key (kbd "<prior>")   'switch-to-buffer)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Make Ctrl-W function as backward-delete-word if region is not active
@@ -380,7 +380,7 @@ With argument, do this that many times."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Delete a region if a key is pressed
-(delete-selection-mode t)
+;(delete-selection-mode t)
 
 ;; Use Ctrl-x m as a shortcut for Alt-X (execute-extended-command)
 (global-set-key (kbd "C-x C-m") 'execute-extended-command)
